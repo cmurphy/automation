@@ -177,6 +177,7 @@ function _lvcreate()
     # fallback: create in VG (if PVs with different size exist)
     $sudo lvcreate -n $lv_name -L ${lv_size}G $lv_vg $lv_pv || \
         safely $sudo lvcreate -n $lv_name -L ${lv_size}G $lv_vg
+    $sudo chown $UID /dev/$lv_vg/$lv_name
 }
 
 # spread block devices over a LVM's PVs so that different VMs
@@ -330,12 +331,12 @@ function libvirt_do_onhost_deploy_image()
     fi
 
     echo "Cloning $role node vdisk from $image ..."
-    safely $sudo qemu-img convert -t none -O raw -S 0 -p $cachedir/$image $disk
+    safely qemu-img convert -t none -O raw -S 0 -p $cachedir/$image $disk
 
     # resize the last partition only if it has id 83
     local last_part=$(fdisk -l $disk | grep -c "^$disk")
-    if $sudo fdisk -l $disk | grep -q "$last_part *\* *.*83 *Linux" ; then
-        echo -e "d\n$last_part\nn\np\n$last_part\n\n\na\n$last_part\nw" | $sudo fdisk $disk
+    if fdisk -l $disk | grep -q "$last_part *\* *.*83 *Linux" ; then
+        echo -e "d\n$last_part\nn\np\n$last_part\n\n\na\n$last_part\nw" | fdisk $disk
         local part=$($sudo kpartx -asv $disk|perl -ne 'm/add map (\S+'"$last_part"') / && print $1')
         test -n "$part" || complain 31 "failed to find partition #$last_part"
         local bdev=/dev/mapper/$part
@@ -362,7 +363,7 @@ function libvirt_do_setuplonelynodes()
         local lonely_disk
         lonely_disk="$vdisk_dir/${cloud}.node$i"
 
-        $sudo lvdisplay "$lonely_disk" || \
+        test -w "$lonely_disk" || \
             _lvcreate "${cloud}.node$i" "${lonelynode_hdd_size}" "$cloudvg"
 
         onhost_deploy_image "lonely" $(get_lonely_node_dist) $lonely_disk
