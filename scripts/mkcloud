@@ -651,9 +651,13 @@ function setupnodes
         local ironic_params=""
         [[ $want_ironic ]] && ironic_params="--ironicnic $ironicnic"
 
+        local ipmi_params=""
+        [[ $want_ipmi ]] && ipmi_params="--ipmi"
+
         ${scripts_lib_dir}/libvirt/compute-config $cloud $i \
                         $mac_params \
                         $ironic_params \
+                        $ipmi_params \
                         --cephvolumenumber $cephvolumenumber \
                         --drbdserial "$drbd_serial"\
                         --computenodememory $compute_node_memory \
