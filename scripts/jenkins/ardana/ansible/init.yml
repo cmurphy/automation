@@ -30,8 +30,8 @@
     become: true
     become_user: ardana
 
-  # Ardana creates directory /opt/ardana_packager and service content from it
-  # (with symlinks followed). Ensure it can serve the Pool and Updates repos.
+  # Ardana creates directory /opt/ardana_packager and serves content from it
+  # (with symlinks followed). Ensure it can serve required SLES and Cloud media.
   - name: Link maintenance repos to PACKAGE_CONSTANTS.REPO_DIR
     file:
       state: link
@@ -63,17 +63,6 @@
       scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  ~ardana/.ssh/id_rsa.pub root@{{ item }}:/var/lib/ardana/.ssh/authorized_keys
       ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} chown -R ardana: /var/lib/ardana/.ssh/
       scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  /etc/sudoers.d/ardana root@{{ item }}:/etc/sudoers.d/ardana
-    with_items:
-      - "{{ compute1_mgmt_ip }}"
-      - "{{ compute2_mgmt_ip }}"
-
-  # FIXME: This is ugly and we do not need all the repos from the deployer on the compute nodes
-  - name: Copy zypper repo setup from deployer-controller to compute nodes
-    shell: |
-      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  /etc/zypp/repos.d/DC8S-Media.repo root@{{ item }}:/etc/zypp/repos.d/DC8S-Media.repo
-      echo "Successful scp of media repo"
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} zypper -n --gpg-auto-import-keys ref
-      echo "Successful refresh of repos"
     with_items:
       - "{{ compute1_mgmt_ip }}"
       - "{{ compute2_mgmt_ip }}"

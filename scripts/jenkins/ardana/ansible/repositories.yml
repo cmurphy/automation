@@ -15,6 +15,7 @@
       state: directory
       path: /srv/tftpboot/suse-12.3/x86_64/repos/{{ item }}
     with_items:
+      - Cloud
       - SLES12-SP3-Pool
       - SLES12-SP3-Updates
       - SUSE-OpenStack-Cloud-8-Pool
@@ -25,29 +26,30 @@
       state: mounted
       fstype: nfs
       opts: ro,nosuid,rsize=8192,wsize=8192,hard,intr,nolock
-      name: /srv/tftpboot/suse-12.3/x86_64/repos/{{ item }}
-      src: "{{ clouddata_server }}:/srv/nfs/repos/x86_64/{{ item }}"
+      name: /srv/tftpboot/suse-12.3/x86_64/repos/{{ item.name }}
+      src: "{{ clouddata_server }}:/srv/nfs/repos/x86_64/{{ item.src }}"
     with_items:
-      - SLES12-SP3-Pool
-      - SLES12-SP3-Updates
-      - SUSE-OpenStack-Cloud-8-Pool
-      - SUSE-OpenStack-Cloud-8-Updates
+      - name: Cloud
+        src: "{{ cloudsource }}"
+      - name: SLES12-SP3-Pool
+        src: SLES12-SP3-Pool
+      - name: SLES12-SP3-Updates
+        src:  SLES12-SP3-Updates
+      - name: SUSE-OpenStack-Cloud-8-Pool
+        src: SUSE-OpenStack-Cloud-8-Pool
+      - name: SUSE-OpenStack-Cloud-8-Updates
+        src: SUSE-OpenStack-Cloud-8-Updates
 
   - name: Add zypper repos
     zypper_repository:
       repo: "/srv/tftpboot/suse-12.3/x86_64/repos/{{ item }}"
       name: "{{ item }}"
     with_items:
+      - Cloud
       - SLES12-SP3-Pool
       - SLES12-SP3-Updates
       - SUSE-OpenStack-Cloud-8-Pool
       - SUSE-OpenStack-Cloud-8-Updates
-
-  # Devel:Cloud:8
-  - name: "Add {{ cloudsource }} media"
-    zypper_repository:
-      repo: "http://{{ clouddata_server }}/repos/x86_64/{{ cloudsource }}"
-      name: DC8S-Media
 
   - name: Repo for sshpass
     zypper_repository:
