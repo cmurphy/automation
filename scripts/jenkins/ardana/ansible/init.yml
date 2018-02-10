@@ -179,6 +179,16 @@
       src: input-model-firewall-rules.yml
       dest: /var/lib/ardana/openstack/my_cloud/definition/data/firewall_rules.yml
 
+  - name: Install changes under test
+    shell: |
+      su - ardana
+      zypper --non-interactive install patch
+      git -c http.sslVerify=false clone https://git.suse.provo.cloud/ardana/osconfig-ansible
+      cd osconfig-ansible
+      git -c http.sslVerify=false fetch https://gerrit.suse.provo.cloud/ardana/osconfig-ansible refs/changes/61/3061/9 && git format-patch -1 --stdout FETCH_HEAD > ~/test.patch
+      cd /var/lib/ardana/openstack/ardana/ansible
+      patch -p1 < ~/test.patch
+
   - name: Add my_cloud config to git
     shell: |
       git add -A
