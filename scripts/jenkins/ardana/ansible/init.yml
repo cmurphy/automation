@@ -9,6 +9,7 @@
   vars:
     deployer_model: deployerincloud-lite
     tempest_run_filter: smoke
+    playbook_changes: ''
 
   tasks:
   - name: Write deployer info to /etc/motd
@@ -21,6 +22,16 @@
     shell: |
       /usr/sbin/growpart /dev/vda 1 && /sbin/resize2fs /dev/vda1
     ignore_errors: True
+
+  - name: Install patch package
+    zypper:
+      name: patch
+
+  - name: Prepare playbook changes to test
+    include: checkout-playbook-changes.yml
+    vars:
+      changes: "{{ playbook_changes.split() }}"
+    when: playbook_changes != ''
 
   - name: Call ardana-init
     shell: /usr/bin/ardana-init
