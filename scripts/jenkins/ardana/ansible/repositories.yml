@@ -4,7 +4,7 @@
   gather_facts: False
 
   vars:
-    clouddata_server: provo-clouddata.cloud.suse.de
+    clouddata_server: provo2-clouddata.cloud.suse.de
     download_suse_server: download.suse.de
     cloudsource: SUSE-OpenStack-Cloud-8-devel-staging
     arch: x86_64
