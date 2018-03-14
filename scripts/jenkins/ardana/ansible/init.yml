@@ -25,231 +25,231 @@
       /usr/sbin/growpart /dev/vda 1 && /sbin/resize2fs /dev/vda1
     ignore_errors: True
 
-  - name: Call ardana-init
-    shell: /usr/bin/ardana-init
-    become: true
-    become_user: ardana
-
-  - name: Create ssh key for ardana user on deployer
-    shell: |
-      [ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
-    become: true
-    become_user: ardana
-
-  - name: Create ssh key for root user on deployer
-    shell: |
-      [ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
-
-  - name: Copy root key to non-deployer nodes
-    shell: |
-      sshpass -p linux ssh-copy-id -o ConnectionAttempts=120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {{ item }}
-    with_items:
-      - "{{ controller_mgmt_ips|default([]) }}"
-      - "{{ compute_mgmt_ips }}"
-    ignore_errors: True
-    when: item != "" and item != deployer_mgmt_ip
-
-  - name: Create ardana user/group on non-deployer nodes
-    shell: |
-      ssh -o ConnectionAttempts=120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "getent group ardana || groupadd -r ardana"
-      ssh -o ConnectionAttempts=120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "getent passwd ardana || useradd -m -g ardana -d /var/lib/ardana -c 'Ardana Home' -r -s /bin/bash ardana"
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} mkdir -p /var/lib/ardana/.ssh/
-      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  ~ardana/.ssh/id_rsa.pub root@{{ item }}:/var/lib/ardana/.ssh/authorized_keys
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} chown -R ardana: /var/lib/ardana/.ssh/
-      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  /etc/sudoers.d/ardana root@{{ item }}:/etc/sudoers.d/ardana
-    with_items:
-      - "{{ controller_mgmt_ips|default([]) }}"
-      - "{{ compute_mgmt_ips }}"
-    when: item != "" and item != deployer_mgmt_ip
-
-  # Ardana creates directory /opt/ardana_packager and serves content from it
-  # (with symlinks followed). Ensure it can serve required SLES and Cloud media.
-  - name: Link maintenance repos to PACKAGE_CONSTANTS.REPO_DIR
-    file:
-      state: link
-      path: /opt/ardana_packager/ardana/sles12/zypper/suse
-      src: /srv/www/suse-12.3/x86_64/repos
-
-  # FIXME(colleen): This can go away when https://gerrit.suse.provo.cloud/3061 merges
-  - name: Copy zypper repo setup from deployer to other nodes
-    shell: |
-      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  /etc/zypp/repos.d/*-http.repo root@{{ item }}:/etc/zypp/repos.d/
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} zypper -n --gpg-auto-import-keys ref
-    with_items:
-      - "{{ controller_mgmt_ips|default([]) }}"
-      - "{{ compute_mgmt_ips }}"
-    when: item != "" and item != deployer_mgmt_ip
-
-  # osconfig-ansible should take care of installing the repositories itself,
-  # it's just that it won't auto accept the Devel key, so do that now
-  - name: Import Devel:Cloud:8 key
-    shell: |
-      kf=/srv/www/suse-12.3/x86_64/repos/Cloud/repodata/repomd.xml.key
-      [ -r $kf ] || kf=/srv/www/suse-12.3/x86_64/repos/Cloud/content.key
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "cat >/tmp/cloud.key && rpm --import /tmp/cloud.key && rm /tmp/cloud.key" < $kf
-    with_items:
-      - "{{ controller_mgmt_ips|default([]) }}"
-      - "{{ compute_mgmt_ips }}"
-    when: item != "" and item != deployer_mgmt_ip
-
-  - name: Grow 1st partition filesystem on non-deployer nodes
-    become: yes
-    shell: |
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} "/usr/sbin/growpart /dev/vda 1 && /sbin/resize2fs /dev/vda1"
-    ignore_errors: True
-    with_items:
-      - "{{ controller_mgmt_ips|default([]) }}"
-      - "{{ compute_mgmt_ips }}"
-    when: item != "" and item != deployer_mgmt_ip
-
-  - name: Initialize target Model from "{{ deployer_model }}"
-    synchronize:
-      src: "/var/lib/ardana/openstack/ardana-ci/{{ deployer_model}}/"
-      dest: /var/lib/ardana/openstack/my_cloud/definition/
-    delegate_to: "{{ inventory_hostname }}"
-    become: true
-    become_user: ardana
-    tags:
-      - create-ardana-input-model
-
-  - name: Update servers in Model
-    template:
-      src: "{{ deployer_model }}/input-model-servers.yml"
-      dest: /var/lib/ardana//openstack/my_cloud/definition/data/servers.yml
-      owner: ardana
-      group: ardana
-    tags:
-      - create-ardana-input-model
-
-  - name: Update DNS servers in Model
-    shell: >
-      python -c "
-         import yaml;
-         f = open('cloudConfig.yml');
-         data = yaml.load(f.read());
-         f.close();
-         data['cloud']['dns-settings']['nameservers'] = {{ mgmt_dnsservers }} ;
-         data['cloud']['ntp-servers'] = ['ntp.suse.de'];
-         f = open('cloudConfig.yml', 'w');
-         f.write(yaml.safe_dump(data, default_flow_style=False));
-         f.close();"
-    args:
-      chdir: /var/lib/ardana//openstack/my_cloud/definition/
-    tags:
-      - create-ardana-input-model
-
-  - name: Update network-groups in Model
-    copy:
-      src: "{{ deployer_model }}/input-model-network-groups.yml"
-      dest: /var/lib/ardana//openstack/my_cloud/definition/data/network_groups.yml
-    tags:
-      - create-ardana-input-model
-
-  - name: Update nic-mappings in Model
-    copy:
-      src: "{{ deployer_model }}/input-model-nic-mappings.yml"
-      dest: /var/lib/ardana//openstack/my_cloud/definition/data/nic_mappings.yml
-    tags:
-      - create-ardana-input-model
-
-  - name: Update nic-global in Model
-    copy:
-      src: "{{ deployer_model }}/input-model-net-global.yml"
-      dest: /var/lib/ardana/openstack/my_cloud/definition/data/net_global.yml
-    tags:
-      - create-ardana-input-model
-
-  - name: Update controller disk mapping in Model
-    copy:
-      src: "{{ deployer_model }}/input-model-disks-controller.yml"
-      dest: /var/lib/ardana/openstack/my_cloud/definition/data/disks_controller.yml
-    tags:
-      - create-ardana-input-model
-
-  # FIXME: This can go away when https://suse-jira.dyndns.org/browse/SCRD-2479
-  #        is addressed.
-  - name: Switch designate to use bind in Input Model
-    replace:
-      dest: /var/lib/ardana/openstack/my_cloud/definition/data/control_plane.yml
-      regexp: 'powerdns'
-      replace: 'bind'
-    tags:
-      - create-ardana-input-model
-
-  - name: Allow ICMP in Model
-    copy:
-      src: input-model-firewall-rules.yml
-      dest: /var/lib/ardana/openstack/my_cloud/definition/data/firewall_rules.yml
-
-  - name: Add my_cloud config to git
-    shell: |
-      git add -A
-      git commit -q -m "Add custom config to git" || true
-    args:
-      chdir: /var/lib/ardana//openstack/ardana/ansible
-    become: true
-    become_user: ardana
-
-  - name: Run config-processor-run.yml playbook
-    shell: |
-      ansible-playbook -vvv -i hosts/localhost -e encrypt="" -e rekey="" config-processor-run.yml
-  #    no_log: True
-    register: out
-    args:
-      chdir: /var/lib/ardana/openstack/ardana/ansible
-    become: true
-    become_user: ardana
-
-  #- name: Output of config-processor-run.yml playbook
-  #  debug: var
-
-  - name: Run ready-deployment.yml playbook
-    shell: |
-      ansible-playbook -vvv -i hosts/localhost ready-deployment.yml
-    args:
-      chdir: /var/lib/ardana/openstack/ardana/ansible
-    become: true
-    become_user: ardana
-
-  - name: Enable skip_disk_config on controller
-    shell: |
-      mkdir -p /etc/openstack/
-      touch /etc/openstack/skip_disk_config
-
-  - name: Enable skip_disk_config on computes
-    # Using ardana + sudo here to avoid issues with remote root access after running site.yml
-    # for the first time
-    shell: |
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  {{ item }} sudo mkdir /etc/openstack/
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  {{ item }} sudo touch /etc/openstack/skip_disk_config
-    with_items:
-      - "{{ controller_mgmt_ips|default([]) }}"
-      - "{{ compute_mgmt_ips }}"
-    become: true
-    when: item != "" and item != deployer_mgmt_ip
-    become_user: ardana
-
-  - name: Run the actual deployment site.yml playbook
-    shell: |
-      ansible-playbook -vvv -i hosts/verb_hosts site.yml
-    args:
-      chdir: /var/lib/ardana/scratch/ansible/next/ardana/ansible
-    become: true
-    become_user: ardana
-
-  - name: Configure Cloud for Tempest run
-    shell: |
-      ansible-playbook -vvv -i hosts/verb_hosts ardana-cloud-configure.yml
-    args:
-      chdir: /var/lib/ardana/scratch/ansible/next/ardana/ansible
-    become: true
-    become_user: ardana
-
-  - name: Run tempest
-    shell: |
-      ansible-playbook -vvv -i hosts/verb_hosts tempest-run.yml \
-                       -e run_filter="{{ tempest_run_filter }}"
-    args:
-      chdir: /var/lib/ardana/scratch/ansible/next/ardana/ansible
-    become: true
-    become_user: ardana
+#  - name: Call ardana-init
+#    shell: /usr/bin/ardana-init
+#    become: true
+#    become_user: ardana
+#
+#  - name: Create ssh key for ardana user on deployer
+#    shell: |
+#      [ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
+#    become: true
+#    become_user: ardana
+#
+#  - name: Create ssh key for root user on deployer
+#    shell: |
+#      [ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
+#
+#  - name: Copy root key to non-deployer nodes
+#    shell: |
+#      sshpass -p linux ssh-copy-id -o ConnectionAttempts=120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no {{ item }}
+#    with_items:
+#      - "{{ controller_mgmt_ips|default([]) }}"
+#      - "{{ compute_mgmt_ips }}"
+#    ignore_errors: True
+#    when: item != "" and item != deployer_mgmt_ip
+#
+#  - name: Create ardana user/group on non-deployer nodes
+#    shell: |
+#      ssh -o ConnectionAttempts=120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "getent group ardana || groupadd -r ardana"
+#      ssh -o ConnectionAttempts=120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "getent passwd ardana || useradd -m -g ardana -d /var/lib/ardana -c 'Ardana Home' -r -s /bin/bash ardana"
+#      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} mkdir -p /var/lib/ardana/.ssh/
+#      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  ~ardana/.ssh/id_rsa.pub root@{{ item }}:/var/lib/ardana/.ssh/authorized_keys
+#      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} chown -R ardana: /var/lib/ardana/.ssh/
+#      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  /etc/sudoers.d/ardana root@{{ item }}:/etc/sudoers.d/ardana
+#    with_items:
+#      - "{{ controller_mgmt_ips|default([]) }}"
+#      - "{{ compute_mgmt_ips }}"
+#    when: item != "" and item != deployer_mgmt_ip
+#
+#  # Ardana creates directory /opt/ardana_packager and serves content from it
+#  # (with symlinks followed). Ensure it can serve required SLES and Cloud media.
+#  - name: Link maintenance repos to PACKAGE_CONSTANTS.REPO_DIR
+#    file:
+#      state: link
+#      path: /opt/ardana_packager/ardana/sles12/zypper/suse
+#      src: /srv/www/suse-12.3/x86_64/repos
+#
+#  # FIXME(colleen): This can go away when https://gerrit.suse.provo.cloud/3061 merges
+#  - name: Copy zypper repo setup from deployer to other nodes
+#    shell: |
+#      scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  /etc/zypp/repos.d/*-http.repo root@{{ item }}:/etc/zypp/repos.d/
+#      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} zypper -n --gpg-auto-import-keys ref
+#    with_items:
+#      - "{{ controller_mgmt_ips|default([]) }}"
+#      - "{{ compute_mgmt_ips }}"
+#    when: item != "" and item != deployer_mgmt_ip
+#
+#  # osconfig-ansible should take care of installing the repositories itself,
+#  # it's just that it won't auto accept the Devel key, so do that now
+#  - name: Import Devel:Cloud:8 key
+#    shell: |
+#      kf=/srv/www/suse-12.3/x86_64/repos/Cloud/repodata/repomd.xml.key
+#      [ -r $kf ] || kf=/srv/www/suse-12.3/x86_64/repos/Cloud/content.key
+#      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "cat >/tmp/cloud.key && rpm --import /tmp/cloud.key && rm /tmp/cloud.key" < $kf
+#    with_items:
+#      - "{{ controller_mgmt_ips|default([]) }}"
+#      - "{{ compute_mgmt_ips }}"
+#    when: item != "" and item != deployer_mgmt_ip
+#
+#  - name: Grow 1st partition filesystem on non-deployer nodes
+#    become: yes
+#    shell: |
+#      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  root@{{ item }} "/usr/sbin/growpart /dev/vda 1 && /sbin/resize2fs /dev/vda1"
+#    ignore_errors: True
+#    with_items:
+#      - "{{ controller_mgmt_ips|default([]) }}"
+#      - "{{ compute_mgmt_ips }}"
+#    when: item != "" and item != deployer_mgmt_ip
+#
+#  - name: Initialize target Model from "{{ deployer_model }}"
+#    synchronize:
+#      src: "/var/lib/ardana/openstack/ardana-ci/{{ deployer_model}}/"
+#      dest: /var/lib/ardana/openstack/my_cloud/definition/
+#    delegate_to: "{{ inventory_hostname }}"
+#    become: true
+#    become_user: ardana
+#    tags:
+#      - create-ardana-input-model
+#
+#  - name: Update servers in Model
+#    template:
+#      src: "{{ deployer_model }}/input-model-servers.yml"
+#      dest: /var/lib/ardana//openstack/my_cloud/definition/data/servers.yml
+#      owner: ardana
+#      group: ardana
+#    tags:
+#      - create-ardana-input-model
+#
+#  - name: Update DNS servers in Model
+#    shell: >
+#      python -c "
+#         import yaml;
+#         f = open('cloudConfig.yml');
+#         data = yaml.load(f.read());
+#         f.close();
+#         data['cloud']['dns-settings']['nameservers'] = {{ mgmt_dnsservers }} ;
+#         data['cloud']['ntp-servers'] = ['ntp.suse.de'];
+#         f = open('cloudConfig.yml', 'w');
+#         f.write(yaml.safe_dump(data, default_flow_style=False));
+#         f.close();"
+#    args:
+#      chdir: /var/lib/ardana//openstack/my_cloud/definition/
+#    tags:
+#      - create-ardana-input-model
+#
+#  - name: Update network-groups in Model
+#    copy:
+#      src: "{{ deployer_model }}/input-model-network-groups.yml"
+#      dest: /var/lib/ardana//openstack/my_cloud/definition/data/network_groups.yml
+#    tags:
+#      - create-ardana-input-model
+#
+#  - name: Update nic-mappings in Model
+#    copy:
+#      src: "{{ deployer_model }}/input-model-nic-mappings.yml"
+#      dest: /var/lib/ardana//openstack/my_cloud/definition/data/nic_mappings.yml
+#    tags:
+#      - create-ardana-input-model
+#
+#  - name: Update nic-global in Model
+#    copy:
+#      src: "{{ deployer_model }}/input-model-net-global.yml"
+#      dest: /var/lib/ardana/openstack/my_cloud/definition/data/net_global.yml
+#    tags:
+#      - create-ardana-input-model
+#
+#  - name: Update controller disk mapping in Model
+#    copy:
+#      src: "{{ deployer_model }}/input-model-disks-controller.yml"
+#      dest: /var/lib/ardana/openstack/my_cloud/definition/data/disks_controller.yml
+#    tags:
+#      - create-ardana-input-model
+#
+#  # FIXME: This can go away when https://suse-jira.dyndns.org/browse/SCRD-2479
+#  #        is addressed.
+#  - name: Switch designate to use bind in Input Model
+#    replace:
+#      dest: /var/lib/ardana/openstack/my_cloud/definition/data/control_plane.yml
+#      regexp: 'powerdns'
+#      replace: 'bind'
+#    tags:
+#      - create-ardana-input-model
+#
+#  - name: Allow ICMP in Model
+#    copy:
+#      src: input-model-firewall-rules.yml
+#      dest: /var/lib/ardana/openstack/my_cloud/definition/data/firewall_rules.yml
+#
+#  - name: Add my_cloud config to git
+#    shell: |
+#      git add -A
+#      git commit -q -m "Add custom config to git" || true
+#    args:
+#      chdir: /var/lib/ardana//openstack/ardana/ansible
+#    become: true
+#    become_user: ardana
+#
+#  - name: Run config-processor-run.yml playbook
+#    shell: |
+#      ansible-playbook -vvv -i hosts/localhost -e encrypt="" -e rekey="" config-processor-run.yml
+#  #    no_log: True
+#    register: out
+#    args:
+#      chdir: /var/lib/ardana/openstack/ardana/ansible
+#    become: true
+#    become_user: ardana
+#
+#  #- name: Output of config-processor-run.yml playbook
+#  #  debug: var
+#
+#  - name: Run ready-deployment.yml playbook
+#    shell: |
+#      ansible-playbook -vvv -i hosts/localhost ready-deployment.yml
+#    args:
+#      chdir: /var/lib/ardana/openstack/ardana/ansible
+#    become: true
+#    become_user: ardana
+#
+#  - name: Enable skip_disk_config on controller
+#    shell: |
+#      mkdir -p /etc/openstack/
+#      touch /etc/openstack/skip_disk_config
+#
+#  - name: Enable skip_disk_config on computes
+#    # Using ardana + sudo here to avoid issues with remote root access after running site.yml
+#    # for the first time
+#    shell: |
+#      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  {{ item }} sudo mkdir /etc/openstack/
+#      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  {{ item }} sudo touch /etc/openstack/skip_disk_config
+#    with_items:
+#      - "{{ controller_mgmt_ips|default([]) }}"
+#      - "{{ compute_mgmt_ips }}"
+#    become: true
+#    when: item != "" and item != deployer_mgmt_ip
+#    become_user: ardana
+#
+#  - name: Run the actual deployment site.yml playbook
+#    shell: |
+#      ansible-playbook -vvv -i hosts/verb_hosts site.yml
+#    args:
+#      chdir: /var/lib/ardana/scratch/ansible/next/ardana/ansible
+#    become: true
+#    become_user: ardana
+#
+#  - name: Configure Cloud for Tempest run
+#    shell: |
+#      ansible-playbook -vvv -i hosts/verb_hosts ardana-cloud-configure.yml
+#    args:
+#      chdir: /var/lib/ardana/scratch/ansible/next/ardana/ansible
+#    become: true
+#    become_user: ardana
+#
+#  - name: Run tempest
+#    shell: |
+#      ansible-playbook -vvv -i hosts/verb_hosts tempest-run.yml \
+#                       -e run_filter="{{ tempest_run_filter }}"
+#    args:
+#      chdir: /var/lib/ardana/scratch/ansible/next/ardana/ansible
+#    become: true
+#    become_user: ardana
