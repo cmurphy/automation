@@ -14,24 +14,24 @@
 
   tasks:
   # SLES repos
-  # FIXME(colleen): This can go away once https://gerrit.suse.provo.cloud/3061 merges
-  - name: Add SLES12SP3-Pool zypper repo
-    zypper_repository:
-      repo: "{{ repos_url }}/SLES12-SP3-Pool"
-      name: SLES12SP3-Pool-http
+  ## FIXME(colleen): This can go away once https://gerrit.suse.provo.cloud/3061 merges
+  #- name: Add SLES12SP3-Pool zypper repo
+  #  zypper_repository:
+  #    repo: "{{ repos_url }}/SLES12-SP3-Pool"
+  #    name: SLES12SP3-Pool-http
 
-  # FIXME(colleen): This can go away once https://gerrit.suse.provo.cloud/3061 merges
-  - name: Add SLES12SP3-Updates zypper repo
-    zypper_repository:
-      repo: "{{ repos_url }}/SLES12-SP3-Updates"
-      name: SLES12SP3-Updates-http
+  ## FIXME(colleen): This can go away once https://gerrit.suse.provo.cloud/3061 merges
+  #- name: Add SLES12SP3-Updates zypper repo
+  #  zypper_repository:
+  #    repo: "{{ repos_url }}/SLES12-SP3-Updates"
+  #    name: SLES12SP3-Updates-http
 
-  # FIXME(colleen): This can go away once https://gerrit.suse.provo.cloud/3061 merges
-  # Devel:Cloud:8
-  - name: "Add {{ cloudsource }} media"
-    zypper_repository:
-      repo: "{{ cloudsource_url }}"
-      name: DC8S-Media-http
+  ## FIXME(colleen): This can go away once https://gerrit.suse.provo.cloud/3061 merges
+  ## Devel:Cloud:8
+  #- name: "Add {{ cloudsource }} media"
+  #  zypper_repository:
+  #    repo: "{{ cloudsource_url }}"
+  #    name: DC8S-Media-http
 
   - name: Create srv directories
     file:
