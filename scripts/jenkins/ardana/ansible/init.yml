@@ -9,7 +9,7 @@
   vars:
     deployer_model: deployerincloud-lite
     tempest_run_filter: smoke
-    playbook_changes: ''
+    playbook_changes: 'ardana/ardana-ansible,3582 ardana/ardana-ansible,3586 ardana/osconfig-ansible,3061 ardana/osconfig-ansible,3560'
 
   tasks:
   - name: Write deployer info to /etc/motd
