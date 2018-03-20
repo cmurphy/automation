@@ -9,7 +9,7 @@
   vars:
     deployer_model: deployerincloud-lite
     tempest_run_filter: smoke
-    playbook_changes: ''
+    playbook_changes: 'ardana/osconfig-ansible,3705 ardana/ardana-ansible,3708'
 
   environment:
     ARDANA_INIT_AUTO: 1
