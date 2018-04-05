@@ -47,6 +47,10 @@
         # src: SUSE-OpenStack-Cloud-8-Pool
         # - name: SUSE-OpenStack-Cloud-8-Updates
         # src: SUSE-OpenStack-Cloud-8-Updates
+        - name: HPE-Helion-OpenStack-Cloud-8-Pool
+          src: HPE-Helion-OpenStack-Cloud-8-Pool
+        - name: HPE-Helion-OpenStack-Cloud-8-Updates
+          src: HPE-Helion-OpenStack-Cloud-8-Updates
 
   - name: Add zypper repos
     zypper_repository:
@@ -59,6 +63,8 @@
         #TODO Add these only if not develcloud media is used
         # - SUSE-OpenStack-Cloud-8-Pool
         # - SUSE-OpenStack-Cloud-8-Updates
+        - HPE-Helion-OpenStack-Cloud-8-Pool
+        - HPE-Helion-OpenStack-Cloud-8-Updates
 
   - name: Repo for sshpass
     zypper_repository:
