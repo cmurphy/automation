@@ -69,13 +69,21 @@
       - "{{ compute_mgmt_ips }}"
     when: item != "" and item != deployer_mgmt_ip
 
-  # osconfig-ansible should take care of installing the repositories itself,
-  # it's just that it won't auto accept the Devel key, so do that now
-  - name: Import Devel:Cloud:8 key
+  ## osconfig-ansible should take care of installing the repositories itself,
+  ## it's just that it won't auto accept the Devel key, so do that now
+  #- name: Import Devel:Cloud:8 key
+  #  shell: |
+  #    kf=/srv/www/suse-12.3/x86_64/repos/Cloud/repodata/repomd.xml.key
+  #    [ -r $kf ] || kf=/srv/www/suse-12.3/x86_64/repos/Cloud/content.key
+  #    ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "cat >/tmp/cloud.key && rpm --import /tmp/cloud.key && rm /tmp/cloud.key" < $kf
+  #  with_items:
+  #    - "{{ controller_mgmt_ips|default([]) }}"
+  #    - "{{ compute_mgmt_ips }}"
+  #  when: item != "" and item != deployer_mgmt_ip
+
+  - name: Add comurphy repo
     shell: |
-      kf=/srv/www/suse-12.3/x86_64/repos/Cloud/repodata/repomd.xml.key
-      [ -r $kf ] || kf=/srv/www/suse-12.3/x86_64/repos/Cloud/content.key
-      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "cat >/tmp/cloud.key && rpm --import /tmp/cloud.key && rm /tmp/cloud.key" < $kf
+      ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@{{ item }} "zypper ar http://download.suse.de/ibs/home:/comurphy:/branches:/Devel:/Cloud:/8:/Staging/images/repo/SUSE-OPENSTACK-CLOUD-8-POOL-x86_64-Media1/ Cloud && zypper -n --gpg-auto-import-keys ref"
     with_items:
       - "{{ controller_mgmt_ips|default([]) }}"
       - "{{ compute_mgmt_ips }}"

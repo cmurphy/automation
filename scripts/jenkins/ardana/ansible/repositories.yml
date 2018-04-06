@@ -36,8 +36,8 @@
       # Use a consistent name for the Cloud media install repo so that we
       # don't have to account for development versus production repos in the
       # playbooks
-      - name: Cloud
-        src: "{{ cloudsource }}"
+      #- name: Cloud
+      #  src: "{{ cloudsource }}"
       - name: SLES12-SP3-Pool
         src: SLES12-SP3-Pool
       - name: SLES12-SP3-Updates
@@ -53,12 +53,17 @@
       repo: "/srv/www/suse-12.3/x86_64/repos/{{ item }}"
       name: "{{ item }}"
     with_items:
-      - Cloud
+      #- Cloud
       - SLES12-SP3-Pool
       - SLES12-SP3-Updates
         #TODO Add these only if not develcloud media is used
         # - SUSE-OpenStack-Cloud-8-Pool
         # - SUSE-OpenStack-Cloud-8-Updates
+
+  - name: Add comurphy repo
+    zypper_repository:
+      repo: http://download.suse.de/ibs/home:/comurphy:/branches:/Devel:/Cloud:/8:/Staging/images/repo/SUSE-OPENSTACK-CLOUD-8-POOL-x86_64-Media1/
+      name: Cloud
 
   - name: Repo for sshpass
     zypper_repository:
