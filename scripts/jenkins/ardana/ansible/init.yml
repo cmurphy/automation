@@ -24,6 +24,9 @@
 
   - include: pre-deploy-checks.yml
 
+  - name: sleep
+    command: sleep 300
+
   - name: Call ardana-init
     shell: /usr/bin/ardana-init
     environment:

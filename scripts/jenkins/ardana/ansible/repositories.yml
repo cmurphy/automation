@@ -96,6 +96,15 @@
       name: sshpass
       state: absent
 
+  - name: Install SMT stuff
+    zypper:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - yast2-smt
+      - smt
+      - SuSEfirewall2
+
   - name: Install/Update ardana pattern
     zypper:
       name: "patterns-cloud-ardana"
