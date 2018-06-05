@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+    stages {
+        stage('Preparation') {
+            steps {
+                sh "git clone ${github_repo} || true"
+                script {
+                    DIR = github_repo.split('/').last()
+                }
+                sh "cd ${DIR} && git fetch origin pull/${pull_request_id}/head && git checkout FETCH_HEAD && git log -1"
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Building"
+            }
+        }
+        stage('Results') {
+            steps {
+                echo "Done"
+            }
+        }
+    }
+}
