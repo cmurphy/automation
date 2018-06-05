@@ -3,7 +3,11 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                checkout scm
+                sh "git clone ${github_repo} || true"
+                script {
+                    DIR = github_repo.split('/').last()
+                }
+                sh "cd ${DIR} && git fetch origin pull/${pull_request_id}/head && git checkout FETCH_HEAD && git log -1"
             }
         }
         stage('Build') {
