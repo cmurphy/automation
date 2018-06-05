@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                sh "python3 checkout-pull-requests.py ${github_repo} ${pull_request_id}"
+                sh "python checkout-pull-requests.py ${github_repo} ${pull_request_id}"
             }
         }
         stage('Build') {
