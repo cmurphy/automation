@@ -3,8 +3,6 @@ pipeline {
     stages {
         stage('Preparation') {
             steps {
-                sh "whoami"
-                sh "sudo true"
                 sh "scripts/crowbar-testbuild.rb -o ${ghorg} -r ${ghrepo} -p ${pr_str} -c scripts/ardana-testbuild.yaml"
             }
         }
