@@ -150,7 +150,8 @@ class CrowbarTestbuild
 
   def package_name
     pack = @repo
-    pack = "crowbar-" + pack unless pack.start_with?("crowbar")
+    #pack = "crowbar-" + pack unless pack.start_with?("crowbar")
+    pack = "ardana-" + pack.chomp("-ansible")
     pack
   end
 

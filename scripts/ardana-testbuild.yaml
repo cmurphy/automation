@@ -1,0 +1,19 @@
+branches:
+  master:
+    bs_project:  Devel:Cloud:8
+    bs_repo:     SLE_12_SP3
+infrastructure:
+  htdocs_dir: /tmp/colleen/
+  osc:
+    cmd: /usr/bin/osc
+    parameters:
+      _global:
+        - -A
+        - https://api.suse.de
+      co:
+        - -c
+        # - --server-side-source-service-files # for SAP
+      build:
+        - --noverify
+        - --trust-all-projects
+        #- --noservice # for SAP, to skip local service run, if server side source service files is enabled ; for us because otherwise commented out patches are causing a failure, which is not really relevant.
