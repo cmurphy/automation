@@ -17,7 +17,7 @@ pipeline {
         stage('Run tests') {
             steps {
               waitUntil {
-                sh "python3 jenkins/ci.suse.de/check-if-merged.py'
+                sh "python3 jenkins/ci.suse.de/check-if-merged.py"
               }
               echo "The pull request merged!"
             }
