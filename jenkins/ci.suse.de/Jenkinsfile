@@ -25,10 +25,10 @@ pipeline {
                       try {
                           sh "python jenkins/ci.suse.de/check-if-merged.py ${ghorg} ${ghrepo} ${pr_str}"
                           merged = true
-                      } catch {
+                      } catch (err) {
                           merged = false
                       }
-                      return merged
+                      merged
                   }
               }
               echo "The pull request merged!"
