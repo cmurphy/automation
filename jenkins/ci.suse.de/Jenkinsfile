@@ -19,16 +19,17 @@ pipeline {
         }
         stage('Run tests') {
             steps {
-              waitUntil {
-                def merged = false
-                try {
-                    sh "python jenkins/ci.suse.de/check-if-merged.py ${ghorg} ${ghrepo} ${pr_str}"
-                    merged = true
-                } catch {
-                    merged = false
-                }
-                return merged
-
+              script {
+                  waitUntil {
+                      def merged = false
+                      try {
+                          sh "python jenkins/ci.suse.de/check-if-merged.py ${ghorg} ${ghrepo} ${pr_str}"
+                          merged = true
+                      } catch {
+                          merged = false
+                      }
+                      return merged
+                  }
               }
               echo "The pull request merged!"
             }
