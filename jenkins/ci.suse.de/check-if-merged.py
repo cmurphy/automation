@@ -5,9 +5,12 @@ import requests
 
 org, repo, pr_str = sys.argv[1:]
 pr_id = pr_str.split(':')[0]
-pr_url = 'https://api.github.com/repos/%(org)s/$(repo)s/pulls/$(pr_id)s' % {
+pr_url = 'https://api.github.com/repos/%(org)s/%(repo)s/pulls/%(pr_id)s' % {
              'org': org, 'repo': repo, 'pr_id': pr_id }
+print pr_url
 pr = requests.get(pr_url)
+print pr
+print pr.json()
 merged = pr.json()['merged']
 if merged:
     sys.exit(0)
