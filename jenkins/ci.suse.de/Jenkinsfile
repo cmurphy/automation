@@ -2,7 +2,9 @@ pipeline {
     agent any
     stages {
         stage('Set up cloud nodes') {
-            echo "Setting up nodes"
+            steps {
+                echo "Setting up nodes"
+            }
         }
         stage('Check pull request') {
             agent {
