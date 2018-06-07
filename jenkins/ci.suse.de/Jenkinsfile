@@ -1,12 +1,13 @@
 pipeline {
     agent any
     stages {
-        stage('Preparation') {
+        stage('Build Pull Request') {
             agent {
                 label 'cloud-testbuild-pr'
             }
             steps {
                 sh "scripts/crowbar-testbuild.rb -o ${ghorg} -r ${ghrepo} -p ${pr_str} -c scripts/ardana-testbuild.yaml"
+                sh "ls /tmp/colleen"
             }
         }
         stage('Build') {
