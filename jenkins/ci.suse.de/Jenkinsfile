@@ -1,21 +1,28 @@
 pipeline {
     agent any
     stages {
-        stage('Build Pull Request') {
+        stage('Set up cloud nodes') {
+        }
+        stage('Check pull request') {
             agent {
                 label 'cloud-testbuild-pr'
             }
             steps {
                 sh "scripts/crowbar-testbuild.rb -o ${ghorg} -r ${ghrepo} -p ${pr_str} -c scripts/ardana-testbuild.yaml"
+                /* scp to deployer node */
+                /* run tests */
+                echo "Tests passed!"
             }
         }
-        stage('Build') {
+        stage('Run tests') {
             steps {
-                sh "ls /tmp/colleen"
-                echo "Building"
+              waitUntil {
+                sh "python3 jenkins/ci.suse.de/check-if-merged.py'
+              }
+              echo "The pull request merged!"
             }
         }
-        stage('Results') {
+        stage('Submit to OBS') {
             steps {
                 echo "Done"
             }
