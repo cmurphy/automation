@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import json
 import requests
 
@@ -10,6 +11,6 @@ pr_url = 'https://api.github.com/repos/%(org)s/$(repo)s/pulls/$(pr_id)s' % {
 pr = requests.get(pr_url)
 merged = json.loads(pr)['merged']
 if merged:
-    exit 0
+    sys.exit(0)
 else:
-    exit 1
+    sys.exit(1)
