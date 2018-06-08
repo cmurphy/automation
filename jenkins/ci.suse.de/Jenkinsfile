@@ -13,10 +13,19 @@ pipeline {
             }
         }
         stage('Installing') {
+            steps {
+                echo "Installing"
+            }
         }
         stage('Testing') {
+            steps {
+                echo "Installing"
+            }
         }
         stage('Results') {
+            steps {
+                echo "Installing"
+            }
         }
     }
 }
