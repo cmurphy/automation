@@ -4,8 +4,7 @@ pipeline {
         stage('Setting up') {
             steps {
                 echo "Checking out package from OBS"
-                echo "Is osc password in cleartext? ${oscpw}"
-                echo "Updating package source"
+                sh "jenkins/ci.suse.de/update-package.sh"
                 echo "Submitting to staging project"
                 echo "Waiting for package to build"
                 echo "Setting up test nodes"
