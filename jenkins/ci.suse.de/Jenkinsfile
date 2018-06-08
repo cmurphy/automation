@@ -2,6 +2,9 @@ pipeline {
     agent any
     stages {
         stage('Setting up') {
+            agent {
+                label "cloud-trackupstream"
+            }
             steps {
                 echo "Checking out package from OBS"
                 sh "jenkins/ci.suse.de/update-package.sh"
