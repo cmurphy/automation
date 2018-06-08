@@ -1,43 +1,22 @@
 pipeline {
     agent any
     stages {
-        stage('Set up cloud nodes') {
+        stage('Setting up') {
             steps {
-                echo "Setting up nodes"
+                echo "Checking out package from OBS"
+                echo "Is osc password in cleartext? ${oscpw}"
+                echo "Updating package source"
+                echo "Submitting to staging project"
+                echo "Waiting for package to build"
+                echo "Setting up test nodes"
+                echo "Setting up repositories"
             }
         }
-        stage('Check pull request') {
-            agent {
-                label 'cloud-testbuild-pr'
-            }
-            steps {
-                sh "scripts/crowbar-testbuild.rb -o ${ghorg} -r ${ghrepo} -p ${pr_str} -c scripts/ardana-testbuild.yaml"
-                /* scp to deployer node */
-                /* run tests */
-                echo "Tests passed!"
-            }
+        stage('Installing') {
         }
-        stage('Run tests') {
-            steps {
-              script {
-                  waitUntil {
-                      def merged = false
-                      try {
-                          sh "python jenkins/ci.suse.de/check-if-merged.py ${ghorg} ${ghrepo} ${pr_str}"
-                          merged = true
-                      } catch (err) {
-                          merged = false
-                      }
-                      merged
-                  }
-              }
-              echo "The pull request merged!"
-            }
+        stage('Testing') {
         }
-        stage('Submit to OBS') {
-            steps {
-                echo "Done"
-            }
+        stage('Results') {
         }
     }
 }
