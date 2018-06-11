@@ -32,6 +32,7 @@ export ANSIBLE_KEEP_REMOTE_FILES=1
 # the name for the cloud defined in ~./config/openstack/clouds.yaml
 
 # init the git tree
+rm -r automation-git
 git clone $git_automation_repo --branch $git_automation_branch automation-git
 pushd automation-git/scripts/jenkins/ardana/
 
