@@ -53,18 +53,20 @@ pushd automation-git/scripts/jenkins/ardana/
 #        num_compute=3
 #        ;;
 #    dac-min*)
-        num_controller=0
-        num_compute=1
+#        num_controller=0
+#        num_compute=1
 #        ;;
 #    deployerincloud*)
-#        num_controller=0
-#        num_compute=2
+        num_controller=0
+        num_compute=2
 #        ;;
 #    *)
 #        num_controller=1
 #        num_compute=2
 #        ;;
 #esac
+
+model=deployerincloud-lite
 
 openstack --os-cloud $CLOUD_CONFIG_NAME stack create --timeout 5 --wait \
     -t heat-ardana-${model}.yaml  \
