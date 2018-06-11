@@ -8,8 +8,6 @@ pipeline {
             steps {
                 echo "Checking out package from OBS"
                 sh "jenkins/ci.suse.de/update-package.sh"
-                echo "Submitting to staging project"
-                echo "Waiting for package to build"
                 echo "Setting up test nodes"
                 echo "Setting up repositories"
             }

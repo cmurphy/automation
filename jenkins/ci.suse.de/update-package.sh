@@ -14,3 +14,12 @@ osc rm ardana-osconfig*.obscpio
 osc service disabledrun
 osc add ardana-osconfig*.obscpio
 osc commit -m "autocheckin test"
+while osc results | grep '\(building\|scheduled\)' ; do
+    echo "Waiting for build results"
+    sleep 10
+done
+if ! osc results | grep succeeded ; then
+    echo "Build failed"
+    exit 1
+fi
+exit 0
