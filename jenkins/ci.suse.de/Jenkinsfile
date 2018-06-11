@@ -6,6 +6,7 @@ pipeline {
                 label "openstack-trackupstream"
             }
             steps {
+                sh "grep user ~/.oscrc || grep user ~/.config/osc/oscrc"
                 echo "Checking out package from OBS"
                 sh "jenkins/ci.suse.de/update-package.sh"
                 echo "Submitting to staging project"
