@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -x
+#!/usr/bin/env bash
+
+set -x
 
 alias osc='osc -A https://api.suse.de'
 
