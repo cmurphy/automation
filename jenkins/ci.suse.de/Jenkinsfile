@@ -1,20 +1,22 @@
 pipeline {
     agent any
     stages {
-        stage('Setting up') {
+        stage('Updating test repositories') {
             agent {
                 label "openstack-trackupstream"
             }
             steps {
-                echo "Checking out package from OBS"
+                echo "Updating packages"
                 sh "jenkins/ci.suse.de/update-package.sh"
-                echo "Setting up test nodes"
-                echo "Setting up repositories"
             }
         }
-        stage('Installing') {
+        stage('Setting up nodes') {
+            agent {
+                label "cloud-ardana-ci"
+            }
             steps {
-                echo "Installing"
+                echo "Setting up test nodes"
+                sh "jenkins/ci.suse.de/setup-nodes.sh"
             }
         }
         stage('Testing') {
