@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Setting up') {
             agent {
-                label "cloud-trackupstream"
+                label "openstack-trackupstream"
             }
             steps {
                 echo "Checking out package from OBS"
