@@ -20,7 +20,9 @@ pipeline {
                 /*
                 sh "jenkins/ci.suse.de/setup-nodes.sh"
                 */
-                test_results = 'success'
+                script {
+                    test_results = 'success'
+                }
             }
         }
         stage('Accept changes') {
