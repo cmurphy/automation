@@ -1,7 +1,7 @@
+def test_results = ''
 pipeline {
     agent any
     stages {
-        def test_results = ''
         stage('Updating test repositories') {
             agent {
                 label "openstack-trackupstream"
