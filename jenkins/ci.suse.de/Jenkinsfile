@@ -17,7 +17,9 @@ pipeline {
             }
             steps {
                 echo "Setting up test nodes"
+                /*
                 sh "jenkins/ci.suse.de/setup-nodes.sh"
+                */
                 test_results = 'success'
             }
         }
