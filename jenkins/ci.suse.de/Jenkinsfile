@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    def test_results
+    def test_results = ''
     stages {
         stage('Updating test repositories') {
             agent {
