@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    def test_results = ''
     stages {
         stage('Updating test repositories') {
             agent {
@@ -17,16 +18,15 @@ pipeline {
             steps {
                 echo "Setting up test nodes"
                 sh "jenkins/ci.suse.de/setup-nodes.sh"
+                test_results = 'success'
             }
         }
-        stage('Testing') {
-            steps {
-                echo "Installing"
+        stage('Accept changes') {
+            when {
+                expression { test_results == 'success' }
             }
-        }
-        stage('Results') {
             steps {
-                echo "Installing"
+                echo "Accepting changes"
             }
         }
     }
