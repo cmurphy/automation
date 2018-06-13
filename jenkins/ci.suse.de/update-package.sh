@@ -2,7 +2,7 @@
 
 set -x
 
-$osc='osc -A https://api.suse.de'
+osc='osc -A https://api.suse.de'
 
 if [ -d home\:comurphy\:Fake\:Cloud\:8/ardana-osconfig ] ; then
     rm -r home\:comurphy\:Fake\:Cloud\:8\:A/ardana-osconfig
