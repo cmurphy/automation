@@ -26,6 +26,9 @@ pipeline {
             }
         }
         stage('Accept changes') {
+            agent {
+                label "openstack-trackupstream"
+            }
             when {
                 expression { test_results == 'success' }
             }
