@@ -30,7 +30,7 @@ pipeline {
                 expression { test_results == 'success' }
             }
             steps {
-                sh "jenkins/ci.suse/submit-packages.sh"
+                sh "jenkins/ci.suse.de/submit-packages.sh"
             }
         }
     }
