@@ -1,0 +1,13 @@
+pipeline {
+    agent any
+    stages {
+        stage('Populating test project') {
+            agent {
+                label 'openstack-trackupstream'
+            }
+            steps {
+                sh 'jenkins/ci.suse.de/copy-packages.sh'
+            }
+        }
+    }
+}
