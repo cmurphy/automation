@@ -4,8 +4,16 @@ set -x
 
 osc='osc -A https://api.suse.de'
 
-echo $project
-echo $package
-#requests="$(osc request list home:comurphy:Fake:Cloud:8 | awk '/State:new/{print $1}')"
-#osc -A https://api.suse.de copypac --expand $project $package home:comurphy:Fake:Cloud:8:A
-#osc -A https://api.suse.de comment create -c "validating" request $req
+read -r home_project package <<< $( $osc -A https://api.suse.de request show $request_id | awk '/submit:/{split($2,x,"/"); split(x[2],y,"@"); print x[1],y[1]}' )
+home_project=$(echo $home_project | sed -e 's/:/%3A/g')
+$osc -A https://api.suse.de copypac --expand $home_project $package home:comurphy:Fake:Cloud:8:A
+sleep 8
+while $osc results home:comurphy:Fake:Cloud:8:A $package | grep '\(building\|scheduled\)' ; do
+    echo "Waiting for build results"
+    sleep 10
+done
+if ! $osc results | grep succeeded ; then
+    echo "Build failed"
+    exit 1
+fi
+exit 0
