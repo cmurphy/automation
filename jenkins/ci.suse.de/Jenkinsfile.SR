@@ -24,14 +24,14 @@ pipeline {
                 }
             }
         }
-        post {
-            agent {
-                label 'openstack-trackupstream'
-            }
-            always {
-                sh 'jenkins/ci.suse.de/report-sr-results.sh $test_results'
-                sh 'jenkins/ci.suse.de/cleanup.sh'
-            }
+    }
+    post {
+        agent {
+            label 'openstack-trackupstream'
+        }
+        always {
+            sh 'jenkins/ci.suse.de/report-sr-results.sh $test_results'
+            sh 'jenkins/ci.suse.de/cleanup.sh'
         }
     }
 }
