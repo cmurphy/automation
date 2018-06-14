@@ -29,7 +29,7 @@ pipeline {
                 label 'openstack-trackupstream'
             }
             steps {
-                sh 'jenkins/ci.suse.de/report-sr-results.sh'
+                sh 'jenkins/ci.suse.de/report-sr-results.sh $test_results'
             }
         }
         stage('Clean up test project') {
