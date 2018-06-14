@@ -12,7 +12,7 @@ while $osc results home:comurphy:Fake:Cloud:8:A $package | grep '\(building\|sch
     echo "Waiting for build results"
     sleep 10
 done
-if ! $osc results | grep succeeded ; then
+if ! $osc results home:comurphy:Fake:Cloud:8:A $package | grep succeeded ; then
     echo "Build failed"
     exit 1
 fi
