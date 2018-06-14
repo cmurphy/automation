@@ -11,7 +11,7 @@ pipeline {
                 sh "jenkins/ci.suse.de/update-package.sh"
             }
         }
-        stage('Setting up nodes') {
+        stage('Running tests') {
             agent {
                 label "cloud-ardana-ci"
             }

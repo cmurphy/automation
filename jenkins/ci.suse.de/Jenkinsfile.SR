@@ -1,3 +1,4 @@
+test_results = ''
 pipeline {
     agent any
     stages {
@@ -7,6 +8,36 @@ pipeline {
             }
             steps {
                 sh 'jenkins/ci.suse.de/copy-packages.sh'
+            }
+        }
+        stage('Running tests') {
+            agent {
+                label "cloud-ardana-ci"
+            }
+            steps {
+                echo "Setting up test nodes"
+                /*
+                sh "jenkins/ci.suse.de/setup-nodes.sh"
+                */
+                script {
+                    test_results = 'success'
+                }
+            }
+        }
+        stage('Reporting results') {
+            agent {
+                label 'openstack-trackupstream'
+            }
+            steps {
+                sh 'jenkins/ci.suse.de/report-sr-results.sh'
+            }
+        }
+        stage('Clean up test project') {
+            agent {
+                label 'openstack-trackupstream'
+            }
+            steps {
+                sh 'jenkins/ci.suse.de/cleanup.sh'
             }
         }
     }
