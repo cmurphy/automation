@@ -1,0 +1,45 @@
+interaction_dirs:
+  - ./interactions
+template:
+  user:
+    suse_ardana_user: &suse_ardana_user
+      - cmurphy
+  team:
+    ardana_team: &ardana_team
+      - name: ArdanaCLM/suse-ardana-developers
+        id: 2573788
+  filter:
+    suse_ardana: &suse_ardana
+      - type: MergeBranch
+        config:
+          branches:
+            - master
+      - type: Status
+        config:
+          status: unseen
+      - type: TrustedSource
+        config:
+          users:
+            *suse_ardana_user
+          teams:
+            *ardana_team
+        whitelist_handler:
+          - type: SetStatus
+            parameters:
+              status: pending
+              message: Queued testbuild job
+          - type: JenkinsJobTriggerArdanaTestbuild
+            parameters:
+              detail_logging: true
+              job_name: colleen-testpipeline
+              job_cmd: "../jenkins/jenkins-job-trigger"
+              job_parameters:
+                standard: {}
+pr_processing:
+  - config:
+      organization: cmurphy
+      repositories:
+        - osconfig-ansible
+        - ardana-ansible
+      context: suse/ardana/testbuild
+    filter: *suse_ardana
