@@ -28,7 +28,7 @@ import sys
 import tempfile
 import time
 
-import pymod2pkg
+#import pymod2pkg
 
 import sh
 from sh import Command
@@ -90,7 +90,7 @@ Project used: %(ZUUL_PROJECT)s
         # work around build service bug that triggers a database deadlock
         for fail_counter in range(1, 5):
             try:
-                sh.osc('api', '-T', meta.name, '/source/%s/_meta' % project)
+                sh.osc('-A', 'https://api.suse.de', 'api', '-T', meta.name, '/source/%s/_meta' % project)
                 break
             except sh.ErrorReturnCode_1:
                 # Sleep a bit and try again. This has not been scientifically
@@ -113,7 +113,7 @@ def upload_meta_enable_repository(project, linkproject):
 
 def freeze_project(project):
     """Generate a _frozenlink file for the project"""
-    result = sh.osc('api', '-X', 'POST', '/source/%s?cmd=freezelink' % project)
+    result = sh.osc('-A', 'https://api.suse.de', 'api', '-X', 'POST', '/source/%s?cmd=freezelink' % project)
     if '<status code="ok" />' not in result:
         print('WARNING: freeze the project fails: %s' % result)
 
@@ -126,7 +126,7 @@ def create_new_build_project(workdir, project, linkproject):
         if linkproject:
             upload_meta_enable_repository(project, linkproject)
             freeze_project(project)
-        sh.osc('init', project)
+        sh.osc('-A', 'https://api.suse.de', 'init', project)
     finally:
         os.chdir(olddir)
 
