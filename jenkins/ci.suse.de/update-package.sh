@@ -38,10 +38,25 @@ EOF
     python -c "$code"
 }
 
+function create_source_merge() {
+    local pr_id=$(echo $github_pr | cut -d ':' -f 1)
+    local target_branch=$(echo $github_pr | cut -d ':' f 3)
+
+    mkdir -p source
+    git clone https://github.com/${github_org}/${github_repo}.git source/${github_repo}.git
+    pushd source/${github_repo}.git
+    git fetch origin pull/${pr_id}/head
+    git checkout -b test-merge $target_branch
+    git merge --no-edit FETCH_HEAD
+    popd
+}
+
 function create_test_package() {
     osc copypac --keep-link $develproject $pkgname $testproject
     osc checkout $testproject $pkgname
     pushd $testproject/$pkgname
+    sed -i -e 's#<param name="url">.*</param>#<param name="url">${WORKSPACE}/ardana-ansible.git</param>#' _service
+    sed -i -e 's#<param name="revision">.*</param>#<param name="revision">test-merge</param>#' _service
     osc rm $pkgname*.obscpio
     osc service disabledrun
     osc add $pkgname*.obscpio
@@ -56,6 +71,7 @@ function create_test_package() {
 }
 
 create_project
+create_source_merge
 create_test_package
 
 cleanup
