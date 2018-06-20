@@ -8,8 +8,8 @@ osc() {
 
 #FIXME: use a real programming language
 declare -A pkgmap
-pkgmap=( ["ardana-ansible"]="ardana-ansible", ["osconfig-ansible"]="ardana-osconfig" )
-pkgname="${pkgmap[github_repo]}"
+pkgmap=( ["ardana-ansible"]="ardana-ansible" ["osconfig-ansible"]="ardana-osconfig" )
+pkgname="${pkgmap[$github_repo]}"
 
 testproject=home:comurphy:Fake:Cloud:8:$(uuidgen)
 develproject=home:comurphy:Fake:Cloud:8
