@@ -8,7 +8,7 @@ pipeline {
             }
             steps {
                 echo "Updating packages"
-                sh "jenkins/ci.suse.de/update-package.sh"
+                #sh "jenkins/ci.suse.de/update-package.sh"
             }
         }
         stage('Running tests') {
@@ -21,6 +21,7 @@ pipeline {
                 /*
                 sh "jenkins/ci.suse.de/setup-nodes.sh"
                 */
+                echo "${emit_success}"
                 script {
                     if(emit_success){
                         test_results = 'success'
