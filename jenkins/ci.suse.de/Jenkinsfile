@@ -17,6 +17,7 @@ pipeline {
             }
             steps {
                 echo "Setting up test nodes"
+                echo "Using Cloud repo: home:comurphy:Fake:Cloud:8:${github_pr}"
                 /*
                 sh "jenkins/ci.suse.de/setup-nodes.sh"
                 */

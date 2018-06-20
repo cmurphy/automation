@@ -11,7 +11,7 @@ declare -A pkgmap
 pkgmap=( ["ardana-ansible"]="ardana-ansible" ["osconfig-ansible"]="ardana-osconfig" )
 pkgname="${pkgmap[$github_repo]}"
 
-testproject=home:comurphy:Fake:Cloud:8:$(uuidgen)
+testproject=home:comurphy:Fake:Cloud:8:${github_pr}
 develproject=home:comurphy:Fake:Cloud:8
 
 function cleanup() {
