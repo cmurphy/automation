@@ -7,6 +7,7 @@ pipeline {
                 label "openstack-trackupstream"
             }
             steps {
+                echo "Testing project: ${github_org}/${github_repo} ${github_pr}"
                 echo "Updating packages"
                 sh "jenkins/ci.suse.de/update-package.sh"
             }
