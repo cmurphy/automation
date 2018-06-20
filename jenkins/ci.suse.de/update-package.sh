@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 
-set -x
+set -eux
 
 osc() {
     /usr/bin/osc -A https://api.suse.de $@
 }
 
-pkgname=ardana-${github_repo%-ansible}
+#FIXME: use a real programming language
+declare -A pkgmap
+pkgmap=( ["ardana-ansible"]="ardana-ansible", ["osconfig-ansible"]="ardana-osconfig" )
+pkgname="${pkgmap[github_repo]}"
+
 testproject=home:comurphy:Fake:Cloud:8:$(uuidgen)
 develproject=home:comurphy:Fake:Cloud:8
 
 function cleanup() {
-    if [ -z "$WORKSPACE" ] ; then
-        echo "WORKSPACE not defined"
-        exit 1
-    fi
     if [ -d $WORKSPACE/$testproject/$pkgname ] ; then
         osc delete $WORKSPACE/$testproject/$pkgname
         rm -r $WORKSPACE/$testproject
