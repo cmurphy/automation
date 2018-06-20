@@ -8,7 +8,9 @@ pipeline {
             }
             steps {
                 echo "Updating packages"
-                #sh "jenkins/ci.suse.de/update-package.sh"
+                /*
+                sh "jenkins/ci.suse.de/update-package.sh"
+                */
             }
         }
         stage('Running tests') {
