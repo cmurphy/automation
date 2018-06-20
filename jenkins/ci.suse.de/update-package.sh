@@ -40,7 +40,7 @@ EOF
 
 function create_source_merge() {
     local pr_id=$(echo $github_pr | cut -d ':' -f 1)
-    local target_branch=$(echo $github_pr | cut -d ':' f 3)
+    local target_branch=$(echo $github_pr | cut -d ':' -f 3)
 
     mkdir -p source
     git clone https://github.com/${github_org}/${github_repo}.git source/${github_repo}.git
