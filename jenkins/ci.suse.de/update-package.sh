@@ -3,7 +3,7 @@
 set -eux
 
 osc() {
-    /usr/bin/osc -A https://api.suse.de $@
+    /usr/bin/osc -A https://api.suse.de "$@"
 }
 
 #FIXME: use a real programming language
