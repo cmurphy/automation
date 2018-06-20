@@ -22,8 +22,13 @@ pipeline {
                 sh "jenkins/ci.suse.de/setup-nodes.sh"
                 */
                 script {
-                    test_results = 'success'
+                    if(emit_success){
+                        test_results = 'success'
+                    } else {
+                        test_results = 'failure'
+                    }
                 }
+                echo "$test_results"
             }
         }
         stage('Accept changes') {
