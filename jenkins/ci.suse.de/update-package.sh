@@ -64,7 +64,8 @@ function create_test_package() {
     osc rm $pkgname*.obscpio
     osc service disabledrun
     osc add $pkgname*.obscpio
-    osc commit -m "autocheckin test"
+    osc --debug --http-debug commit -m "autocheckin test"
+    osc status
     sleep 10 # Wait for build to be scheduled
     osc results --watch
     if ! osc results | grep succeeded ; then
