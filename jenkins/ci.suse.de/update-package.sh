@@ -26,6 +26,9 @@ function cleanup() {
 trap cleanup ERR
 
 function create_project() {
+    if [ -d ./out ] ; then
+        rm -r ./out
+    fi
     code=$(cat <<EOF
 import imp
 createproject = imp.load_source('createproject', 'hostscripts/rpm-packaging/createproject.py')
