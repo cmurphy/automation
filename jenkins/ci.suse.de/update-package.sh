@@ -51,6 +51,7 @@ function create_test_package() {
         echo "Build failed"
         exit 1
     fi
+    osc status
     popd
 }
 
