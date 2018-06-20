@@ -59,7 +59,7 @@ function create_test_package() {
     osc copypac --keep-link $develproject $pkgname $testproject
     osc checkout $testproject $pkgname
     pushd $testproject/$pkgname
-    sed -i -e 's#<param name="url">.*</param>#<param name="url">${WORKSPACE}/source/ardana-ansible.git</param>#' _service
+    sed -i -e 's#<param name="url">.*</param>#<param name="url">'${WORKSPACE}'/source/ardana-ansible.git</param>#' _service
     sed -i -e 's#<param name="revision">.*</param>#<param name="revision">test-merge</param>#' _service
     osc rm $pkgname*.obscpio
     osc service disabledrun
