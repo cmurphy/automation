@@ -25,7 +25,7 @@ pipeline {
                 */
                 echo "${emit_success}"
                 script {
-                    if(emit_success){
+                    if(params.emit_success){
                         test_results = 'success'
                     } else {
                         test_results = 'failure'
