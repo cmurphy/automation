@@ -42,17 +42,9 @@ function create_test_package() {
     osc copypac --keep-link $develproject $pkgname $testproject
     osc checkout $testproject $pkgname
     pushd $testproject/$pkgname
-    ls
-    osc status
     osc rm $pkgname*.obscpio
-    ls
-    osc status
     osc service disabledrun
-    ls
-    osc status
     osc add $pkgname*.obscpio
-    ls
-    osc status
     osc commit -m "autocheckin test"
     sleep 10 # Wait for build to be scheduled
     osc results --watch
@@ -60,7 +52,6 @@ function create_test_package() {
         echo "Build failed"
         exit 1
     fi
-    osc status
     popd
 }
 
