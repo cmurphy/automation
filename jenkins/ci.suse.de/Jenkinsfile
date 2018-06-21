@@ -7,7 +7,7 @@ pipeline {
                 label "openstack-trackupstream"
             }
             steps {
-                echo "build cause: ${currentBuild.rawBuild.getCauses()}"
+                echo "$JOB_NAME"
                 echo "Updating packages"
                 sh "jenkins/ci.suse.de/update-package.sh"
             }
