@@ -7,7 +7,6 @@ pipeline {
                 label "openstack-trackupstream"
             }
             steps {
-                echo "$JOB_NAME"
                 echo "Updating packages"
                 sh "jenkins/ci.suse.de/update-package.sh"
             }
@@ -36,7 +35,7 @@ pipeline {
                 label "openstack-trackupstream"
             }
             when {
-                expression { test_results == 'success' }
+                expression { JOB_NAME ==~ /post-merge build/ && test_results == 'success' }
             }
             steps {
                 sh "jenkins/ci.suse.de/submit-packages.sh"
