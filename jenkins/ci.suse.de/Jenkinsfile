@@ -2,7 +2,6 @@ def test_results = ''
 pipeline {
     agent any
     stages {
-    /*
         stage('Updating test repositories') {
             agent {
                 label "openstack-trackupstream"
@@ -27,13 +26,6 @@ pipeline {
                         test_results = 'failure'
                     }
                 }
-            }
-        }
-    */
-        stage('Debug') {
-            steps {
-                echo params.job_name
-                echo job_name
             }
         }
         stage('Report results (github)') {
