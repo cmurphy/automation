@@ -30,6 +30,20 @@ pipeline {
                 }
             }
         }
+        stage('Report results (github)') {
+            agent {
+                label "cloud-trigger"
+            }
+            when {
+                expression { JOB_NAME ==~ /testbuild PR/ }
+            }
+            steps {
+                sh "~/github.com/openSUSE/github-pr/github_pr.rb -a set-status --status ${test_results --org ${github_org} --repo ${github_repo} --pr ${github_pr.split(':')[0]} --sha ${github_pr.split(':')[1]} --context 'suse/ardana/testbuild'"
+            }
+        }
+        stage('Report results (OBS)') {
+            echo "TODO"
+        }
         stage('Accept changes') {
             agent {
                 label "openstack-trackupstream"
