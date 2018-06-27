@@ -42,7 +42,9 @@ pipeline {
             }
         }
         stage('Report results (OBS)') {
-            echo "TODO"
+            steps {
+                echo "TODO"
+            }
         }
         stage('Accept changes') {
             agent {
