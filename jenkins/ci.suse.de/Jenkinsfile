@@ -2,14 +2,16 @@ def test_results = ''
 pipeline {
     agent any
     stages {
-    /*
         stage('Updating test repositories') {
             agent {
                 label "openstack-trackupstream"
             }
             steps {
+            /*
                 echo "Updating packages"
                 sh "jenkins/ci.suse.de/update-package.sh"
+             */
+             echo 'x'
             }
         }
         stage('Running tests') {
@@ -17,6 +19,7 @@ pipeline {
                 label "cloud-ardana-ci"
             }
             steps {
+            /*
                 echo "Setting up test nodes"
                 echo "Using Cloud repo: home:comurphy:Fake:Cloud:8:${github_pr}"
                 /*
@@ -29,9 +32,10 @@ pipeline {
                         test_results = 'failure'
                     }
                 }
+            */
+            echo 'x'
             }
         }
-        */
         stage('Debug') {
             steps {
                 echo params.job_name
