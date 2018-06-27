@@ -41,7 +41,7 @@ pipeline {
                 label "cloud-trigger"
             }
             when {
-                expression { return params.job_name ==~ /testbuild PR/ }
+                expression { return params.job_name =~ /testbuild PR/ }
             }
             steps {
                 sh "~/github.com/openSUSE/github-pr/github_pr.rb -a set-status --status ${test_results} --org ${github_org} --repo ${github_repo} --pr ${github_pr.split(':')[0]} --sha ${github_pr.split(':')[1]} --context 'suse/ardana/testbuild'"
@@ -49,7 +49,7 @@ pipeline {
         }
         stage('Report results (OBS)') {
             when {
-                expression { params.job_name ==~ /testbuild SR/ }
+                expression { params.job_name =~ /testbuild SR/ }
             }
             steps {
                 echo "TODO"
