@@ -36,7 +36,7 @@ pipeline {
                 expression { return params.job_name =~ /testbuild PR/ }
             }
             steps {
-                sh "jenins/ci.suse.de/report-pr.sh"
+                sh "jenkins/ci.suse.de/report-pr.sh ${test_results}"
             }
         }
     }

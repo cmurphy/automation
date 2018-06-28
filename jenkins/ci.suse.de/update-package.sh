@@ -11,7 +11,6 @@ declare -A pkgmap
 pkgmap=( ["ardana-ansible"]="ardana-ansible" ["osconfig-ansible"]="ardana-osconfig" )
 pkgname="${pkgmap[$github_repo]}"
 
-testproject=home:comurphy:Fake:Cloud:8:${github_pr}
 develproject=home:comurphy:Fake:Cloud:8
 
 function cleanup() {
@@ -59,8 +58,10 @@ function create_test_package() {
     osc copypac --keep-link $develproject $pkgname $testproject
     osc checkout $testproject $pkgname
     pushd $testproject/$pkgname
-    sed -i -e 's#<param name="url">.*</param>#<param name="url">'${WORKSPACE}'/source/ardana-ansible.git</param>#' _service
-    sed -i -e 's#<param name="revision">.*</param>#<param name="revision">test-merge</param>#' _service
+    if is_pr ; then
+        sed -i -e 's#<param name="url">.*</param>#<param name="url">'${WORKSPACE}'/source/ardana-ansible.git</param>#' _service
+        sed -i -e 's#<param name="revision">.*</param>#<param name="revision">test-merge</param>#' _service
+    fi
     osc rm $pkgname*.obscpio
     osc service disabledrun
     osc add $pkgname*.obscpio
@@ -79,9 +80,22 @@ function create_test_package() {
     popd
 }
 
-create_project
-create_source_merge
+function is_pr() {
+    test -n "${github_pr:-''}"
+}
+
+function select_staging_project() {
+    echo "home:comurphy:Fake:Cloud:8:A"
+}
+
+if is_pr ; then
+    testproject=home:comurphy:Fake:Cloud:8:${github_pr}
+    create_project
+    create_source_merge
+else
+    testproject=$(select_staging_project)
+fi
 create_test_package
 
 cleanup
-exit 0
+echo $testproject

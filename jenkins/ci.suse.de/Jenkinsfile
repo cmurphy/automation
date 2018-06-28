@@ -8,7 +8,7 @@ pipeline {
             }
             steps {
                 echo "Updating packages"
-                sh "jenkins/ci.suse.de/update-package.sh"
+                staging_project = sh(returnStdout: true, script: 'jenkins/ci.suse.de/update-package.sh').trim()
             }
         }
         stage('Running tests') {
@@ -17,45 +17,24 @@ pipeline {
             }
             steps {
                 echo "Setting up test nodes"
-                echo "Using Cloud repo: home:comurphy:Fake:Cloud:8:${github_pr}"
+                echo "Using Cloud repo: ${staging_project}"
                 //sh "jenkins/ci.suse.de/setup-nodes.sh"
                 script {
                     if(params.emit_success){
                         test_results = 'success'
                     } else {
                         test_results = 'failure'
+                        sh 'exit 1'
                     }
                 }
-            }
-        }
-        stage('Report results (github)') {
-            agent {
-                label "cloud-trigger"
-            }
-            when {
-                expression { return params.job_name =~ /testbuild PR/ }
-            }
-            steps {
-                sh "jenkins/ci.suse.de/report-pr.sh ${test_results}"
-            }
-        }
-        stage('Report results (OBS)') {
-            when {
-                expression { params.job_name =~ /testbuild SR/ }
-            }
-            steps {
-                echo "TODO"
             }
         }
         stage('Accept changes') {
             agent {
                 label "openstack-trackupstream"
             }
-            when {
-                expression { JOB_NAME ==~ /post-merge build/ && test_results == 'success' }
-            }
             steps {
-                sh "jenkins/ci.suse.de/submit-packages.sh"
+                sh "jenkins/ci.suse.de/submit-packages.sh ${staging_project}"
             }
         }
     }
