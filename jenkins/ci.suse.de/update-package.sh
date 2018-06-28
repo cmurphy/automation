@@ -67,7 +67,10 @@ function create_test_package() {
     osc commit -m "autocheckin test"
     osc status
     osc --version
-    sleep 10 # Wait for build to be scheduled
+    # Wait for build to be scheduled
+    while osc results | grep unknown ; do
+        sleep 5
+    done
     osc results --watch
     if ! osc results | grep succeeded ; then
         echo "Build failed"
