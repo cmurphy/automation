@@ -2,6 +2,8 @@
 
 set -eux
 
+test_results=$1
+
 pr=$(echo $github_pr | cut -d ':' -f 1)
 sha=$(echo $github_pr | cut -d ':' -f 2)
 
