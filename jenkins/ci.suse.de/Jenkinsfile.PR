@@ -36,26 +36,7 @@ pipeline {
                 expression { return params.job_name =~ /testbuild PR/ }
             }
             steps {
-                sh "jenkins/ci.suse.de/report-pr.sh"
-            }
-        }
-        stage('Report results (OBS)') {
-            when {
-                expression { params.job_name =~ /testbuild SR/ }
-            }
-            steps {
-                echo "TODO"
-            }
-        }
-        stage('Accept changes') {
-            agent {
-                label "openstack-trackupstream"
-            }
-            when {
-                expression { JOB_NAME ==~ /post-merge build/ && test_results == 'success' }
-            }
-            steps {
-                sh "jenkins/ci.suse.de/submit-packages.sh"
+                sh "jenins/ci.suse.de/report-pr.sh"
             }
         }
     }
