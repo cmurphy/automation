@@ -52,6 +52,10 @@ function create_source_merge() {
     popd
 }
 
+function unchanged() {
+    osc status | grep -e "^[ADM]" >/dev/null
+}
+
 function create_test_package() {
     osc copypac --keep-link $develproject $pkgname $testproject
     osc checkout $testproject $pkgname
@@ -63,6 +67,11 @@ function create_test_package() {
     osc rm $pkgname*.obscpio
     osc service disabledrun
     osc add $pkgname*.obscpio
+    if unchanged ; then
+        osc rdelete $testproject $pkgname
+        cleanup
+        exit 0
+    fi
     osc commit -m "autocheckin test"
     osc status
     osc --version
