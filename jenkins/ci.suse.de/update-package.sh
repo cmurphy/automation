@@ -68,7 +68,7 @@ function create_test_package() {
     osc service disabledrun
     osc add $pkgname*.obscpio
     if unchanged ; then
-        osc rdelete $testproject $pkgname
+        osc rdelete -m "autoremoved" $testproject $pkgname
         cleanup
         exit 0
     fi
