@@ -31,7 +31,7 @@ template:
           - type: JenkinsJobTriggerArdanaTestbuild
             parameters:
               detail_logging: true
-              job_name: colleen-testpipeline
+              job_name: colleen-pr-pipeline
               job_cmd: "../jenkins/jenkins-job-trigger"
               job_parameters:
                 standard: {}
