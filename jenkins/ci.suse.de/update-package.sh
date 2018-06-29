@@ -79,7 +79,7 @@ function create_test_package() {
 }
 
 function is_pr() {
-    test -n "${github_pr:-''}"
+    test -n "${github_pr:-}"
 }
 
 function select_staging_project() {
