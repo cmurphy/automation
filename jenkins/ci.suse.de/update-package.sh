@@ -25,8 +25,6 @@ function cleanup() {
         rm -rf $WORKSPACE/source/${github_repo}.git
     fi
 }
-trap cleanup ERR
-cleanup
 
 function create_project() {
     if [ -d ./out ] ; then
@@ -90,6 +88,7 @@ function select_staging_project() {
 
 if is_pr ; then
     testproject=home:comurphy:Fake:Cloud:8:${github_pr}
+    trap cleanup ERR
     create_project
     create_source_merge
 else
