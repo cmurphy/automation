@@ -97,12 +97,14 @@ function select_staging_project() {
 
 if is_pr ; then
     testproject=home:comurphy:Fake:Cloud:8:${github_pr}
-    trap cleanup ERR
+    trap cleanup EXIT ERR
     create_project
     create_source_merge
 else
     testproject=$(select_staging_project)
+    trap cleanup EXIT ERR
 fi
+cleanup
 create_test_package
 
 cleanup
