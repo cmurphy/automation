@@ -91,21 +91,15 @@ function create_test_package() {
     popd
 }
 
-function select_staging_project() {
-    echo "home:comurphy:Fake:Cloud:8:A"
-}
+testproject=${testproject:-home:comurphy:Fake:Cloud:8:${github_pr}}
+trap cleanup EXIT ERR
 
 if is_pr ; then
-    testproject=home:comurphy:Fake:Cloud:8:${github_pr}
-    trap cleanup EXIT ERR
     create_project
     create_source_merge
 else
-    testproject=$(select_staging_project)
     trap cleanup EXIT ERR
 fi
-cleanup
 create_test_package
 
 cleanup
-echo $testproject
