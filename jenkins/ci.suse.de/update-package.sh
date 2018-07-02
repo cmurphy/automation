@@ -65,7 +65,7 @@ function create_test_package() {
     osc checkout $testproject $pkgname
     pushd $testproject/$pkgname
     if is_pr ; then
-        sed -i -e 's#<param name="url">.*</param>#<param name="url">'${WORKSPACE}'/source/ardana-ansible.git</param>#' _service
+        sed -i -e 's#<param name="url">.*</param>#<param name="url">'${WORKSPACE}'/source/'${github_repo}'.git</param>#' _service
         sed -i -e 's#<param name="revision">.*</param>#<param name="revision">test-merge</param>#' _service
     fi
     osc rm $pkgname*.obscpio
