@@ -8,7 +8,7 @@ pipeline {
             }
             steps {
                 echo "Updating packages"
-                staging_project = sh(returnStdout: true, script: 'jenkins/ci.suse.de/update-package.sh').trim()
+                def staging_project = sh(returnStdout: true, script: 'jenkins/ci.suse.de/update-package.sh').trim()
             }
         }
         stage('Running tests') {
