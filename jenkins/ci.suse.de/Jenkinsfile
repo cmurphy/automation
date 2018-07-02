@@ -3,12 +3,35 @@ def staging_project = ''
 pipeline {
     agent any
     stages {
-        stage('Updating test repositories') {
+        stage('Creating test package from change') {
+            when {
+                anyOf {
+                    expression { params.github_pr != null }
+                    /* submitrequest id
+                    expression { }
+                    */
+                }
+            }
             agent {
                 label "openstack-trackupstream"
             }
             steps {
-                echo "Updating packages"
+                sh "jenkins/ci.suse.de/update-package.sh"
+            }
+        }
+        stage('Updating staging repository') {
+            when {
+                allOf {
+                    expression { params.github_pr == null }
+                    /* submitrequest id
+                    expresssion { }
+                    */
+                }
+            }
+            agent {
+                label "openstack-trackupstream"
+            }
+            steps {
                 script {
                     staging_project = sh(returnStdout: true, script: 'jenkins/ci.suse.de/update-packages.sh').trim()
                 }
@@ -35,9 +58,26 @@ pipeline {
                 }
             }
         }
+        stage('Report results') {
+            agent {
+                label "cloud-trigger"
+            }
+            when {
+                expression { return params.github_pr != null }
+            }
+            steps {
+                sh "jenkins/ci.suse.de/report-pr.sh ${test_results}"
+            }
+        }
         stage('Accept changes') {
             when {
-                expression { return staging_project != '' }
+                allOf {
+                    expression { return staging_project != '' }
+                    expression { return env.github_pr == null }
+                    /* submitrequest id
+                    expression { }
+                    */
+                }
             }
             agent {
                 label "openstack-trackupstream"
