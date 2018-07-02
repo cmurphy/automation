@@ -27,7 +27,7 @@ pipeline {
         stage('Updating staging repository') {
             when {
                 allOf {
-                    expression { params.github_pr == null }
+                    expression { return params.github_pr == '' }
                     /* submitrequest id
                     expresssion { }
                     */
@@ -47,7 +47,7 @@ pipeline {
             when {
                 anyOf {
                     expression { return changes_to_test =~ 'found changes to test' }
-                    expression { return params.github_pr != null }
+                    expression { return params.github_pr != '' }
                 }
             }
             agent {
@@ -72,7 +72,7 @@ pipeline {
                 label "cloud-trigger"
             }
             when {
-                expression { return params.github_pr != null }
+                expression { return params.github_pr != '' }
             }
             steps {
                 sh "jenkins/ci.suse.de/report-pr.sh ${test_results}"
