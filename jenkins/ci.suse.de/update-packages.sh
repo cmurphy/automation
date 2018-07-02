@@ -13,7 +13,7 @@ export test_project=$1
 
 for r in $repos ; do
     export github_repo=$r
-    ${SCRIPT_DIR}/update-package.sh 1>&2
+    ${SCRIPT_DIR}/update-package.sh $test_project 1>&2
 done
 
 if [ $(osc -A https://api.suse.de ls $test_project | wc -l) -gt 0 ] ; then
