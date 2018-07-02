@@ -8,7 +8,7 @@ pipeline {
         stage('Creating test package from change') {
             when {
                 anyOf {
-                    expression { params.github_pr != null }
+                    expression { params.github_pr != '' }
                     /* submitrequest id
                     expression { }
                     */
