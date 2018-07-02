@@ -20,7 +20,13 @@ done
 
 if [ $(osc -A https://api.suse.de ls $testproject | wc -l) -gt 0 ] ; then
     for p in $(osc -A https://api.suse.de ls $testproject) ; do
-        osc -A https://api.suse.de results --watch $testproject $p
+        while osc results $testproject $p | grep '\(unknown\|building\|scheduled\|finished\)' ; do
+            sleep 5
+        done
+        if osc results $testproject $p | grep failed ; then
+            echo "Package $p failed to build"
+            exit 1
+        fi
     done
 else
     testproject=''
