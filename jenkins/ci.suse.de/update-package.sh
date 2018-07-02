@@ -53,7 +53,7 @@ function create_source_merge() {
 }
 
 function unchanged() {
-    osc status | grep -e "^[ADM]" >/dev/null
+    ! osc status | grep -e "^[ADM]" >/dev/null
 }
 
 function create_test_package() {
