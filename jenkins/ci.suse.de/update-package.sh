@@ -56,6 +56,10 @@ function unchanged() {
     ! osc status | grep -e "^[ADM]" >/dev/null
 }
 
+function is_pr() {
+    test -n "${github_pr:-}"
+}
+
 function create_test_package() {
     osc copypac --keep-link $develproject $pkgname $testproject
     osc checkout $testproject $pkgname
@@ -73,22 +77,18 @@ function create_test_package() {
         exit 0
     fi
     osc commit -m "autocheckin test"
-    osc status
-    osc --version
-    # Wait for build to be scheduled
-    while osc results | grep unknown ; do
-        sleep 5
-    done
-    osc results --watch
-    if ! osc results | grep succeeded ; then
-        echo "Build failed"
-        exit 1
+    if is_pr ; then
+        # Wait for build to be scheduled
+        while osc results | grep unknown ; do
+            sleep 5
+        done
+        osc results --watch
+        if ! osc results | grep succeeded ; then
+            echo "Build failed"
+            exit 1
+        fi
     fi
     popd
-}
-
-function is_pr() {
-    test -n "${github_pr:-}"
 }
 
 function select_staging_project() {
