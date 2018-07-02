@@ -14,9 +14,9 @@ pkgname="${pkgmap[$github_repo]}"
 develproject=home:comurphy:Fake:Cloud:8
 
 function cleanup() {
-    if [ -d $WORKSPACE/$testproject/$pkgname ] ; then
-        osc delete $WORKSPACE/$testproject/$pkgname
-        rm -r $WORKSPACE/$testproject
+    if [ -d $WORKSPACE/$test_project/$pkgname ] ; then
+        osc delete $WORKSPACE/$test_project/$pkgname
+        rm -r $WORKSPACE/$test_project
     fi
     if [ -d $WORKSPACE/out ] ; then
         rm -r $WORKSPACE/out
@@ -33,7 +33,7 @@ function create_project() {
     code=$(cat <<EOF
 import imp
 createproject = imp.load_source('createproject', 'hostscripts/rpm-packaging/createproject.py')
-createproject.create_new_build_project('out', '$testproject', '$develproject')
+createproject.create_new_build_project('out', '$test_project', '$develproject')
 EOF
     )
     python -c "$code"
@@ -61,9 +61,9 @@ function is_pr() {
 }
 
 function create_test_package() {
-    osc copypac --keep-link $develproject $pkgname $testproject
-    osc checkout $testproject $pkgname
-    pushd $testproject/$pkgname
+    osc copypac --keep-link $develproject $pkgname $test_project
+    osc checkout $test_project $pkgname
+    pushd $test_project/$pkgname
     if is_pr ; then
         sed -i -e 's#<param name="url">.*</param>#<param name="url">'${WORKSPACE}'/source/'${github_repo}'.git</param>#' _service
         sed -i -e 's#<param name="revision">.*</param>#<param name="revision">test-merge</param>#' _service
@@ -72,7 +72,7 @@ function create_test_package() {
     osc service disabledrun
     osc add $pkgname*.obscpio
     if unchanged ; then
-        osc rdelete -m "autoremoved" $testproject $pkgname
+        osc rdelete -m "autoremoved" $test_project $pkgname
         cleanup
         exit 0
     fi
@@ -91,8 +91,9 @@ function create_test_package() {
     popd
 }
 
-testproject=${testproject:-home:comurphy:Fake:Cloud:8:${github_pr}}
 trap cleanup EXIT ERR
+
+test_project=$1
 
 if is_pr ; then
     create_project
