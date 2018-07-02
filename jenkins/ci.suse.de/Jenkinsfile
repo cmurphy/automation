@@ -82,7 +82,7 @@ pipeline {
             when {
                 allOf {
                     expression { return staging_project != '' }
-                    expression { return env.github_pr == null }
+                    expression { return params.github_pr == '' }
                     /* submitrequest id
                     expression { }
                     */
