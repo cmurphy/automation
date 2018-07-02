@@ -83,6 +83,7 @@ pipeline {
                 allOf {
                     expression { return staging_project != '' }
                     expression { return params.github_pr == '' }
+                    expression { return test_results == 'success' }
                     /* submitrequest id
                     expression { }
                     */
