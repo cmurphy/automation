@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     staging_project = sh(returnStdout: true, script: 'jenkins/ci.suse.de/select-project.sh').trim()
-                    changes_to_test = sh(returnStdout: true, script: 'jenkins/ci.suse.de/update-packages.sh').trim()
+                    changes_to_test = sh(returnStdout: true, script: 'jenkins/ci.suse.de/update-packages.sh ${staging_project}').trim()
                 }
             }
         }
