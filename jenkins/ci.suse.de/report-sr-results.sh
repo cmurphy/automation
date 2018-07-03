@@ -3,7 +3,7 @@
 set -eux
 
 osc () {
-    osc -A https://api.suse.de $@
+    /usr/bin/osc -A https://api.suse.de $@
 }
 
 test_results=$1
