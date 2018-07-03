@@ -44,6 +44,7 @@ pipeline {
                 anyOf {
                     expression { return changes_to_test =~ 'found changes to test' }
                     expression { return params.github_pr != '' }
+                    expression { return params.submitrequest_id != '' }
                 }
             }
             agent {
@@ -78,7 +79,7 @@ pipeline {
                     if (params.github_pr != '') {
                         sh "jenkins/ci.suse.de/report-pr.sh ${test_results}"
                     } else if (params.submitrequest_id != '') {
-                        sh "jenkins/ci.suse.de/report-sr-results.sh $test_results"
+                        sh "jenkins/ci.suse.de/report-sr-results.sh ${test_results}"
                     }
                 }
             }
@@ -88,10 +89,8 @@ pipeline {
                 allOf {
                     expression { return stagingproject != '' }
                     expression { return params.github_pr == '' }
+                    expression { return params.submitrequest_id == '' }
                     expression { return test_results == 'success' }
-                    /* submitrequest id
-                    expression { }
-                    */
                 }
             }
             agent {
