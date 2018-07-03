@@ -93,7 +93,7 @@ function create_test_package() {
 }
 
 function get_values_from_submitrequest() {
-    read -r develproject pkgname <<< $( $osc request show $request_id | \
+    read -r develproject pkgname <<< $( osc request show $request_id | \
         awk '/submit:/{split($2,x,"/"); split(x[2],y,"@"); print x[1],y[1]}' )
 }
 
