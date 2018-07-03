@@ -14,8 +14,8 @@ function cleanup() {
     if [ -d $WORKSPACE/out ] ; then
         rm -r $WORKSPACE/out
     fi
-    if [ -d $WORKSPACE/source/${github_repo}.git ] ; then
-        rm -rf $WORKSPACE/source/${github_repo}.git
+    if [ -d $WORKSPACE/source/${github_repo:-NONE}.git ] ; then
+        rm -rf $WORKSPACE/source/${github_repo:-NONE}.git
     fi
 }
 
