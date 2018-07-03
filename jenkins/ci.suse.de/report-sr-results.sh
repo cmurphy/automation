@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+set -eux
 
 osc () {
     osc -A https://api.suse.de $@
@@ -8,4 +8,4 @@ osc () {
 
 test_results=$1
 
-$osc comment create -c "$test_results" request $request_id
+osc comment create -c "$test_results" request $submitrequest_id
