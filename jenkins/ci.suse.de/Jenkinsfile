@@ -54,7 +54,7 @@ pipeline {
                 echo "Setting up test nodes"
                 echo "Using Cloud repo: ${stagingproject}"
                 script {
-                    test_results = build(job: 'colleen-openstack-ardana-copy', parameters: [[$class: 'StringParameterValue', 'name': 'test_repository', value: "http://download.suse.de/ibs/${stagingprojectreplaceAll(':', ':/')}:/master/standard"]]).getResult()
+                    test_results = build(job: 'colleen-openstack-ardana-copy', parameters: [[$class: 'StringParameterValue', 'name': 'test_repository', value: "http://download.suse.de/ibs/${stagingproject.replaceAll(':', ':/')}:/master/standard"]]).getResult()
                 }
                 echo $test_results
             }
