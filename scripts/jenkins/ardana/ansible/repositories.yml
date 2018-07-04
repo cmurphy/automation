@@ -25,13 +25,13 @@
     with_items: "{{ repositories.split(',')|unique|list }}"
     when: repositories != ''
 
-  #- name: Add Cloud to repository list
-  #  set_fact:
-  #    # Use a consistent name for the Cloud media install repo so that we
-  #    # don't have to account for development versus production repos in the
-  #    # playbooks
-  #    repos_dict: "{{ {'Cloud': cloudsource}|combine(repos_dict) }}"
-  #  when: cloudsource != ''
+  - name: Add Cloud to repository list
+    set_fact:
+      # Use a consistent name for the Cloud media install repo so that we
+      # don't have to account for development versus production repos in the
+      # playbooks
+      repos_dict: "{{ {'Cloud': cloudsource}|combine(repos_dict) }}"
+    when: cloudsource != ''
 
   - name: Check srv directories
     stat:
@@ -48,18 +48,18 @@
     with_items:
       - "{{ srv_dir_stats.results }}"
 
-  #- name: Rsync Cloud repo contents
-  #  command: >
-  #    rsync
-  #      --archive
-  #      --sparse
-  #      --hard-links
-  #      --fuzzy
-  #      --delay-updates
-  #      --delete-delay
-  #      'rsync://{{ clouddata_server }}/cloud/repos/x86_64/{{ cloudsource }}/'
-  #      '/srv/www/suse-12.3/x86_64/repos/Cloud/'
-  #  when: cloudsource != ''
+  - name: Rsync Cloud repo contents
+    command: >
+      rsync
+        --archive
+        --sparse
+        --hard-links
+        --fuzzy
+        --delay-updates
+        --delete-delay
+        'rsync://{{ clouddata_server }}/cloud/repos/x86_64/{{ cloudsource }}/'
+        '/srv/www/suse-12.3/x86_64/repos/Cloud/'
+    when: cloudsource != ''
 
   - name: Mount zypper repos
     mount:
@@ -79,10 +79,6 @@
     register: added_repos
     with_items:
       - "{{ srv_dir_stats.results }}"
-
-  - name: Add Cloud staging repo
-    zypper_repository:
-      repo: http://download.suse.de/ibs/home:/comurphy:/Fake:/Cloud:/8:/A/bootstrap_copy/home:comurphy:Fake:Cloud:8:A.repo
 
   - name: Repo for sshpass
     zypper_repository:

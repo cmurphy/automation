@@ -118,7 +118,6 @@ openstack --os-cloud $CLOUD_CONFIG_NAME port list --network $NETWORK_MGMT_ID \
 
 cat ardana_net_vars.yml
 
-repositories='SLES12-SP3-Pool,SLES12-SP3-Updates,SLES12-SP3-Updates-test,SUSE-OpenStack-Cloud-8-Pool,SUSE-OpenStack-Cloud-8-Updates,SUSE-OpenStack-Cloud-8-Updates-test'
 ansible-playbook -v -i hosts ssh-keys.yml
 ansible-playbook -v -i hosts -e "build_url=$BUILD_URL" \
                              -e "cloudsource=${cloudsource}" \
