@@ -59,7 +59,7 @@ pipeline {
                 script {
                     test_results = build(job: 'colleen-openstack-ardana-copy', parameters: [[$class: 'StringParameterValue', 'name': 'test_repository', value: "http://download.suse.de/ibs/${stagingproject.replaceAll(':', ':/')}:/master/standard"]]).getResult()
                 }
-                echo $test_results
+                echo "${test_results}"
             }
         }
         stage('Report results (github)') {
