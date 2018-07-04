@@ -59,7 +59,10 @@ pipeline {
                                          parameters: [
                                              [$class: 'StringParameterValue',
                                               'name': 'test_repository',
-                                              value: test_repository]
+                                              value: test_repository],
+                                             [$class: 'StringParameterValue',
+                                              'name': 'job_name',
+                                              value: 'colleen-test']
                                          ]).getResult()
                 }
                 echo "${test_results}"
