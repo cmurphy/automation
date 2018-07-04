@@ -38,6 +38,7 @@ pipeline {
                     /*
                     changes_to_test = sh(returnStdout: true, script: "scripts/jenkins/ardana/pipeline/update-packages.sh ${stagingproject}").trim()
                     */
+                    changes_to_test = 'found changes to test'
                 }
             }
         }
