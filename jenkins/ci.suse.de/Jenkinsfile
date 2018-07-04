@@ -35,7 +35,9 @@ pipeline {
             steps {
                 script {
                     stagingproject = sh(returnStdout: true, script: 'scripts/jenkins/ardana/pipeline/select-project.sh').trim()
+                    /*
                     changes_to_test = sh(returnStdout: true, script: "scripts/jenkins/ardana/pipeline/update-packages.sh ${stagingproject}").trim()
+                    */
                 }
             }
         }
