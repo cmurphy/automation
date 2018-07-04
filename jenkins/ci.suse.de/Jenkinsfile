@@ -35,10 +35,7 @@ pipeline {
             steps {
                 script {
                     stagingproject = sh(returnStdout: true, script: 'scripts/jenkins/ardana/pipeline/select-project.sh').trim()
-                    /*
                     changes_to_test = sh(returnStdout: true, script: "scripts/jenkins/ardana/pipeline/update-packages.sh ${stagingproject}").trim()
-                    */
-                    changes_to_test = 'found changes to test'
                 }
             }
         }
@@ -57,7 +54,13 @@ pipeline {
                 echo "Setting up test nodes"
                 echo "Using Cloud repo: ${stagingproject}"
                 script {
-                    test_results = build(job: 'colleen-openstack-ardana-copy', parameters: [[$class: 'StringParameterValue', 'name': 'test_repository', value: "http://download.suse.de/ibs/${stagingproject.replaceAll(':', ':/')}:/master/standard"]]).getResult()
+                    def test_repository = "http://download.suse.de/ibs/${stagingproject.replaceAll(':', ':/')}/standard"
+                    test_results = build(job: 'colleen-openstack-ardana-copy',
+                                         parameters: [
+                                             [$class: 'StringParameterValue',
+                                              'name': 'test_repository',
+                                              value: test_repository]
+                                         ]).getResult()
                 }
                 echo "${test_results}"
             }
