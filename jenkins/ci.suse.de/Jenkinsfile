@@ -58,11 +58,14 @@ pipeline {
                     test_results = build(job: 'colleen-openstack-ardana-copy',
                                          parameters: [
                                              [$class: 'StringParameterValue',
-                                              'name': 'test_repository',
+                                              name: 'test_repository',
                                               value: test_repository],
                                              [$class: 'StringParameterValue',
-                                              'name': 'job_name',
-                                              value: 'colleen-test']
+                                              name: 'job_name',
+                                              value: 'colleen-test'],
+                                             [$class: 'StringParameterValue',
+                                              name: 'git_automation_repo',
+                                              value: 'https://github.com/cmurphy/automation']
                                          ]).getResult()
                 }
                 echo "${test_results}"
