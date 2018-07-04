@@ -64,24 +64,28 @@ pipeline {
                 }
             }
         }
-        stage('Report results') {
+        stage('Report results (github)') {
             agent {
                 label "cloud-trigger"
             }
             when {
-                anyOf {
-                    expression { return params.github_pr != '' }
-                    expression { return params.submitrequest_id != '' }
-                }
+                expression { return params.github_pr != '' }
             }
             steps {
                 script {
-                    if (params.github_pr != '') {
-                        sh "jenkins/ci.suse.de/report-pr.sh ${test_results}"
-                    } else if (params.submitrequest_id != '') {
-                        sh "jenkins/ci.suse.de/report-sr-results.sh ${test_results}"
-                    }
+                    sh "jenkins/ci.suse.de/report-pr.sh ${test_results}"
                 }
+            }
+        }
+        stage('Report results (OBS)') {
+            agent {
+                label "openstack-trackupstream"
+            }
+            when {
+                expression { return params.submitrequest_id != '' }
+            }
+            steps {
+                sh "jenkins/ci.suse.de/report-sr-results.sh ${test_results}"
             }
         }
         stage('Accept changes') {
