@@ -48,18 +48,18 @@
     with_items:
       - "{{ srv_dir_stats.results }}"
 
-  - name: Rsync Cloud repo contents
-    command: >
-      rsync
-        --archive
-        --sparse
-        --hard-links
-        --fuzzy
-        --delay-updates
-        --delete-delay
-        'rsync://{{ clouddata_server }}/cloud/repos/x86_64/{{ cloudsource }}/'
-        '/srv/www/suse-12.3/x86_64/repos/Cloud/'
-    when: cloudsource != ''
+  #- name: Rsync Cloud repo contents
+  #  command: >
+  #    rsync
+  #      --archive
+  #      --sparse
+  #      --hard-links
+  #      --fuzzy
+  #      --delay-updates
+  #      --delete-delay
+  #      'rsync://{{ clouddata_server }}/cloud/repos/x86_64/{{ cloudsource }}/'
+  #      '/srv/www/suse-12.3/x86_64/repos/Cloud/'
+  #  when: cloudsource != ''
 
   - name: Mount zypper repos
     mount:
@@ -79,6 +79,11 @@
     register: added_repos
     with_items:
       - "{{ srv_dir_stats.results }}"
+
+  - name: Add cloud repo
+    zypper_repository:
+      repo: "{{ cloudsource_url }}"
+      name: "Cloud"
 
   - name: Repo for sshpass
     zypper_repository:
