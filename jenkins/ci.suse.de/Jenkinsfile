@@ -3,7 +3,7 @@ def stagingproject = ''
 def testproject = ''
 def changes_to_test = ''
 pipeline {
-    agent master
+    agent none
     stages {
         stage('Creating test package from change') {
             when {
