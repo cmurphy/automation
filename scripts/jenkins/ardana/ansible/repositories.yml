@@ -12,6 +12,7 @@
     repos_url: "http://{{ clouddata_server }}/repos/{{ arch }}"
     cloudsource_url: "{{ repos_url }}/{{ cloudsource }}"
     sshpass_repo: "http://download.suse.de/ibs/QA:/SLE12SP3/update/"
+    test_repository_url: ''
 
   tasks:
 
@@ -48,18 +49,18 @@
     with_items:
       - "{{ srv_dir_stats.results }}"
 
-  #- name: Rsync Cloud repo contents
-  #  command: >
-  #    rsync
-  #      --archive
-  #      --sparse
-  #      --hard-links
-  #      --fuzzy
-  #      --delay-updates
-  #      --delete-delay
-  #      'rsync://{{ clouddata_server }}/cloud/repos/x86_64/{{ cloudsource }}/'
-  #      '/srv/www/suse-12.3/x86_64/repos/Cloud/'
-  #  when: cloudsource != ''
+  - name: Rsync Cloud repo contents
+    command: >
+      rsync
+        --archive
+        --sparse
+        --hard-links
+        --fuzzy
+        --delay-updates
+        --delete-delay
+        'rsync://{{ clouddata_server }}/cloud/repos/x86_64/{{ cloudsource }}/'
+        '/srv/www/suse-12.3/x86_64/repos/Cloud/'
+    when: cloudsource != ''
 
   - name: Mount zypper repos
     mount:
@@ -84,6 +85,12 @@
     zypper_repository:
       repo: "{{ cloudsource_url }}"
       name: "Cloud"
+
+  - name: Add test repo
+    zypper_repository:
+      repo: "{{ test_repository_url }}"
+      name: "Cloud-Test"
+    when: test_repository_url != ''
 
   - name: Repo for sshpass
     zypper_repository:
