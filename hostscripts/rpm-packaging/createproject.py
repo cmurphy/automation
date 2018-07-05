@@ -102,7 +102,7 @@ Project used: %(ZUUL_PROJECT)s
 def upload_meta_enable_repository(project, linkproject):
     repository = """
   <repository name="standard" %(repoflags)s>
-    <path project="%(linkproject)s" repository="standard"/>
+    <path project="%(linkproject)s" repository="SLE_12_SP3"/>
     <arch>x86_64</arch>
   </repository>
 """ % ({'linkproject': linkproject,
