@@ -1,5 +1,4 @@
 def test_results = ''
-def stagingproject = ''
 def testproject = ''
 def changes_to_test = ''
 pipeline {
@@ -34,8 +33,8 @@ pipeline {
             }
             steps {
                 script {
-                    stagingproject = sh(returnStdout: true, script: 'scripts/jenkins/ardana/pipeline/select-project.sh').trim()
-                    changes_to_test = sh(returnStdout: true, script: "scripts/jenkins/ardana/pipeline/update-packages.sh ${stagingproject}").trim()
+                    testproject = sh(returnStdout: true, script: 'scripts/jenkins/ardana/pipeline/select-project.sh').trim()
+                    changes_to_test = sh(returnStdout: true, script: "scripts/jenkins/ardana/pipeline/update-packages.sh ${testproject}").trim()
                 }
             }
         }
@@ -52,9 +51,9 @@ pipeline {
             }
             steps {
                 echo "Setting up test nodes"
-                echo "Using Cloud repo: ${stagingproject}"
+                echo "Using Cloud repo: ${testproject}"
                 script {
-                    def test_repository = "http://download.suse.de/ibs/${stagingproject.replaceAll(':', ':/')}/images/repo/SUSE-OPENSTACK-CLOUD-8-POOL-x86_64-Media1/"
+                    def test_repository = "http://download.suse.de/ibs/${testproject.replaceAll(':', ':/')}/images/repo/SUSE-OPENSTACK-CLOUD-8-POOL-x86_64-Media1/"
                     test_results = build(job: 'colleen-openstack-ardana-copy',
                                          parameters: [
                                              [$class: 'StringParameterValue',
@@ -98,7 +97,7 @@ pipeline {
         stage('Accept changes') {
             when {
                 allOf {
-                    expression { return stagingproject != '' }
+                    expression { return testproject != '' }
                     expression { return params.github_pr == '' }
                     expression { return params.submitrequest_id == '' }
                     expression { return test_results == 'success' }
@@ -108,7 +107,7 @@ pipeline {
                 label "openstack-trackupstream"
             }
             steps {
-                sh "scripts/jenkins/ardana/pipeline/submit-packages.sh ${stagingproject}"
+                sh "scripts/jenkins/ardana/pipeline/submit-packages.sh ${testproject}"
             }
         }
     }
