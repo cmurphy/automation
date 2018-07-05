@@ -73,7 +73,7 @@ Project used: %(ZUUL_PROJECT)s
 %(projectlink)s
   <person userid="%(user)s" role="maintainer"/>
   <publish>
-    <disable/>
+    <enable repo="standard"/>
   </publish>
 %(build_repository)s
 </project>""" % ({'project': project,
