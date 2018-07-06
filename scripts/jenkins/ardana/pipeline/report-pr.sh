@@ -16,7 +16,7 @@ wget https://gist.githubusercontent.com/cmurphy/5160df8d37e433582ca6755c6713d4e6
 chmod 600 ./.cmurphy-netrc
 
 ~/github.com/openSUSE/github-pr/github_pr.rb -a set-status \
-    --status ${test_results} \
+    --status $(echo $test_results | tr '[:upper:]' '[:lower:']) \
     --org ${github_org} \
     --repo ${github_repo} \
     --pr ${pr} \
